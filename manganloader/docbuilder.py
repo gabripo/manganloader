@@ -292,12 +292,19 @@ class Document:
     
     def _new_ebook_name(self, old_epub_name: str):
         doc_name = "MANGANAME" if self.name is None else self.name
-        extensions = self._extract_extensions(old_epub_name)
-        device_name = self.get_kcc_option('--profile')
-        return os.path.abspath(os.path.join(
-            self.output_dir,
-            f"{doc_name} {device_name}" + "".join(extensions),
-        ))
+        if self.type == 'cbz':
+            # CBZ format is the same for all the devices
+            return os.path.abspath(os.path.join(
+                self.output_dir,
+                doc_name + ".cbz",
+            ))
+        else:
+            extensions = self._extract_extensions(old_epub_name)
+            device_name = self.get_kcc_option('--profile')
+            return os.path.abspath(os.path.join(
+                self.output_dir,
+                f"{doc_name} {device_name}" + "".join(extensions),
+            ))
     
     @staticmethod
     def _extract_extensions(filename: str):

@@ -31,6 +31,6 @@ if __name__ == '__main__':
     message_epub = f"Generated manga {doc_cbz_name} now available! ARRRWWW!"
 
     doc.set_kcc_option('--profile', 'K11')
-    doc.build_from_url()
+    doc.build_from_url() # file will be overwritten, CBZ files are device-agnostic
     doc.set_type('epub')
     doc.build_from_url()
