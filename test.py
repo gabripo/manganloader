@@ -14,6 +14,7 @@ if __name__ == '__main__':
         document_type='pdf')
     
     doc.clean_working_dir()
+    doc.clean_output_dir()
 
     doc_pdf = doc.build_from_url()
     doc_pdf_name = os.path.basename(doc_pdf)

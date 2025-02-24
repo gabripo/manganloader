@@ -197,6 +197,12 @@ class Document:
         shutil.rmtree(self.working_dir)
         print(f"Working directory {self.working_dir} cleaned!")
 
+    def clean_output_dir(self):
+        print(f"Cleaning output directory {self.output_dir}...")
+        shutil.rmtree(self.output_dir)
+        os.makedirs(self.output_dir) # empty folder
+        print(f"Output directory {self.output_dir} cleaned!")
+
     def _is_supported_type(self, type: str) -> bool:
         return type in self.supported_types
     
