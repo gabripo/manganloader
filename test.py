@@ -13,6 +13,8 @@ if __name__ == '__main__':
         output_dir='output_docs',
         document_type='pdf')
     
+    doc.clean_working_dir()
+
     doc_pdf = doc.build_from_url()
     doc_pdf_name = os.path.basename(doc_pdf)
     message_pdf = f"Generated manga {doc_pdf_name} now available! ARRRWWW!"
@@ -31,5 +33,3 @@ if __name__ == '__main__':
     doc.build_from_url()
     doc.set_type('epub')
     doc.build_from_url()
-
-    doc.clean_working_dir()
