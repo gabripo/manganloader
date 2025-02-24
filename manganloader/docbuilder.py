@@ -20,6 +20,7 @@ class Document:
         self.supported_types = {
             'pdf',
             'epub',
+            'cbz',
         }
         Document.valid_kcc_options = {
             '--profile': {'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OTHER'},
@@ -135,8 +136,8 @@ class Document:
             print(f"Generating {self.type} document from {self.source_url}...")
             if self.type == 'pdf':
                 generated_doc = self._generate_pdf()
-            elif self.type == 'epub':
-                generated_doc = self._generate_epub()
+            elif self.type == 'epub' or self.type == 'cbz':
+                generated_doc = self._generate_ebook()
             print(f"{self.type.upper()} document generation concluded: created file is {generated_doc}!")
             return generated_doc
         else:
@@ -177,8 +178,9 @@ class Document:
             print("No images available to generate the PDF!")
             return ''
 
-    def _generate_epub(self):
+    def _generate_ebook(self):
         input_folder_images = self._get_common_path_images()
+        self.set_kcc_option('--format', self.type.upper())
         if self._valid_kcc_options():
             comic2ebook.main([
                 *self.kcc_options,
@@ -186,14 +188,18 @@ class Document:
                 input_folder_images,
                 ])
         
-            epub_generated = self._get_file_names_with_extension(self.output_dir, '.epub', first_file_only=True)
-            epub_newname = self._new_epub_name(epub_generated)
+            ebook_generated = self._get_file_names_with_extension(
+                self.output_dir,
+                '.' + self.type,
+                first_file_only=True
+                )
+            ebook_newname = self._new_ebook_name(ebook_generated)
             os.rename(
-                epub_generated,
-                epub_newname
+                ebook_generated,
+                ebook_newname
             )
-            print(f"Generated EPUB file: {epub_newname}")
-            return epub_newname
+            print(f"Generated {self.type.upper()} file: {ebook_newname}")
+            return ebook_newname
         else:
             print(f"Invalid options for KCC: no files will be generated!")
             return ''
@@ -226,7 +232,7 @@ class Document:
                         files_with_extension.append(full_file_path)
         return files_with_extension
     
-    def _new_epub_name(self, old_epub_name: str):
+    def _new_ebook_name(self, old_epub_name: str):
         doc_name = "MANGANAME" if self.name is None else self.name
         extensions = self._extract_extensions(old_epub_name)
         return os.path.abspath(os.path.join(
