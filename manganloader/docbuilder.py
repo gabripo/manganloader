@@ -21,6 +21,41 @@ class Document:
             'pdf',
             'epub',
         }
+        Document.valid_kcc_options = {
+            '--profile': {'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OTHER'},
+            '--manga-style': None,
+            '--hq': None,
+            '--two-panel': None,
+            '--webtoon': None,
+            '--targetsize': {100, 400},
+            '--noprocessing': None,
+            '--upscale': None,
+            '--stretch': None,
+            '--splitter': {'0', '1', '2'},
+            '--gamma': {'Auto'},
+            '--cropping': {'0', '1', '2'},
+            '--interpanelcrop': {'0', '1', '2'},
+            '--blackborders': None,
+            '--whiteborders': None,
+            '--forcecolor': None,
+            '--forcepng': None,
+            '--mozjpeg': None,
+            '--maximizestrips': None,
+            '--delete': None,
+            '--format': {'Auto', 'MOBI', 'EPUB', 'CBZ', 'KFX', 'MOBI+EPUB'},
+            '--nokepub': None,
+            '--batchsplit': {'0', '1', '2'},
+            '--spreadshift': None,
+            '--norotate': None,
+            '--reducerainbow': None,
+        }
+        self.kcc_options = [
+            '--manga-style',
+            '--upscale',
+            '--profile', 'KoCC', # Kobo Clara Colour, Gabriele's manga machine
+            '--format', 'EPUB',
+            '--splitter', '2', # rotate
+        ]
         self.output_dir = None
         self.working_dir = None
         self.chapter_number = str(chapter_nunber)
@@ -42,6 +77,29 @@ class Document:
             self.type = document_type
         else:
             print(f"Type {document_type} not supported for the {self.__class__.__name__} class!")
+
+    def set_kcc_option(self, option_name: str, option_val: str = None):
+        if option_val is None:
+            if option_name in set(self.kcc_options):
+                print(f"Option {option_name} already present!")
+                return
+            elif option_name in Document.valid_kcc_options.keys():
+                self.kcc_options.append(option_name)
+                print(f"Option {option_name} for KCC added!")
+                return
+        
+        for idx, option in enumerate(self.kcc_options):
+            if option == option_name and idx < len(self.kcc_options)-1:
+                if option_name not in Document.valid_kcc_options.keys():
+                    print(f"Invalid option {option_name} for KCC specified!")
+                    return
+                if option_val not in Document.valid_kcc_options[option_name]:
+                    print(f"Invalid option value {option_val} for option {option_name} for KCC specified!")
+                    return
+                
+                self.kcc_options[idx+1] = option_val
+                print(f"Option {option_name} for KCC set as {option_val} !")
+                return
 
     def set_output_dir(self, output_dir: str):
         if output_dir is None:
@@ -121,24 +179,24 @@ class Document:
 
     def _generate_epub(self):
         input_folder_images = self._get_common_path_images()
-        comic2ebook.main([
-            '--manga-style',
-            '--upscale',
-            '--profile', 'KoCC', # Kobo Clara Colour, Gabriele's manga machine
-            '--format', 'EPUB',
-            '--splitter', '2', # rotate
-            '--output', self.output_dir,
-            input_folder_images,
-            ])
+        if self._valid_kcc_options():
+            comic2ebook.main([
+                *self.kcc_options,
+                '--output', self.output_dir,
+                input_folder_images,
+                ])
         
-        epub_generated = self._get_file_names_with_extension(self.output_dir, '.epub', first_file_only=True)
-        epub_newname = self._new_epub_name(epub_generated)
-        os.rename(
-            epub_generated,
-            epub_newname
-        )
-        print(f"Generated EPUB file: {epub_newname}")
-        return epub_newname
+            epub_generated = self._get_file_names_with_extension(self.output_dir, '.epub', first_file_only=True)
+            epub_newname = self._new_epub_name(epub_generated)
+            os.rename(
+                epub_generated,
+                epub_newname
+            )
+            print(f"Generated EPUB file: {epub_newname}")
+            return epub_newname
+        else:
+            print(f"Invalid options for KCC: no files will be generated!")
+            return ''
 
     def _new_pdf_name(self):
         doc_name = "MANGANAME" if self.name is None else self.name
@@ -186,3 +244,19 @@ class Document:
             extensions.append(ext)
         
         return [s for s in reversed(extensions)]
+    
+    def _valid_kcc_options(self) -> bool:
+        n_options = len(self.kcc_options)
+        kcc_iterator = self.kcc_options.__iter__()
+        for idx, opt in enumerate(kcc_iterator):
+            if opt not in Document.valid_kcc_options.keys():
+                print(f"Option {opt} for KCC is invalid!")
+                return False
+            elif idx < n_options-1:
+                valid_args_for_option = Document.valid_kcc_options[opt]
+                if valid_args_for_option is not None:
+                    curr_arg = kcc_iterator.__next__() # jumps the argument
+                    if curr_arg not in valid_args_for_option:
+                        print(f"Argument {curr_arg} for option {opt} for KCC is invalid!")
+                        return False
+        return True
