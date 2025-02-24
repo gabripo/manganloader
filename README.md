@@ -16,7 +16,6 @@ pip install -r requirements.txt
 ### KCC as submodule
 Use git to download the [KCC](https://github.com/ciromattia/kcc/tree/master) source code:
 ```bash
-git submodule init
-git submodule add https://github.com/ciromattia/kcc kcc
+git submodule update --init --recursive
 ```
 KCC will be stored into the `kcc` folder - and invoked from there.
