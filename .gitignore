@@ -1,0 +1,4 @@
+output_docs/
+temp/
+env/
+*.pyc

@@ -1,0 +1,19 @@
+# docbuilder
+pillow==11.1.0
+
+# mloader_wrapper
+mloader==1.1.12
+
+# pages_downloader
+aiohttp==3.11.12
+aiofiles==24.1.0
+bs4==0.0.2
+
+# kcc
+natsort==8.4.0
+slugify==0.0.1
+psutil==7.0.0
+mozjpeg_lossless_optimization==1.1.5
+numpy==2.2.3
+distro==1.9.0
+packaging==24.2
