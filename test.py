@@ -17,20 +17,20 @@ if __name__ == '__main__':
     doc.clean_output_dir()
 
     doc_pdf = doc.build_from_url()
-    doc_pdf_name = os.path.basename(doc_pdf)
-    message_pdf = f"Generated manga {doc_pdf_name} now available! ARRRWWW!"
+    message_pdf = f"Generated manga {os.path.basename(doc_pdf)} for {doc.get_device_name()} now available! ARRRWWW!"
 
     doc.set_type('epub')
     doc_epub = doc.build_from_url()
-    doc_epub_name = os.path.basename(doc_epub)
-    message_epub = f"Generated manga {doc_epub_name} now available! ARRRWWW!"
+    message_epub = f"Generated manga {os.path.basename(doc_epub)} for {doc.get_device_name()} now available! ARRRWWW!"
 
     doc.set_type('cbz')
     doc_cbz = doc.build_from_url()
-    doc_cbz_name = os.path.basename(doc_cbz)
-    message_epub = f"Generated manga {doc_cbz_name} now available! ARRRWWW!"
+    message_cbz = f"Generated manga {os.path.basename(doc_cbz)} for {doc.get_device_name()} now available! ARRRWWW!"
 
     doc.set_kcc_option('--profile', 'K11')
-    doc.build_from_url() # file will be overwritten, CBZ files are device-agnostic
+    doc_cbz = doc.build_from_url() # file will be overwritten, CBZ files are device-agnostic
+    message_cbz = f"Generated manga {os.path.basename(doc_cbz)} for {doc.get_device_name()} now available! ARRRWWW!"
+
     doc.set_type('epub')
-    doc.build_from_url()
+    doc_epub = doc.build_from_url()
+    message_epub = f"Generated manga {os.path.basename(doc_epub)} for {doc.get_device_name()} now available! ARRRWWW!"

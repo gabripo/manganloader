@@ -203,6 +203,9 @@ class Document:
         os.makedirs(self.output_dir) # empty folder
         print(f"Output directory {self.output_dir} cleaned!")
 
+    def get_device_name(self):
+        return Document.profile_mapping[self.get_kcc_option('--profile')]
+
     def _is_supported_type(self, type: str) -> bool:
         return type in self.supported_types
     
@@ -252,7 +255,7 @@ class Document:
                 ebook_generated,
                 ebook_newname
             )
-            device_name_extended = Document.profile_mapping[self.get_kcc_option('--profile')]
+            device_name_extended = self.get_device_name()
             print(f"Generated {self.type.upper()} file for device {device_name_extended}: {ebook_newname}")
             return ebook_newname
         else:
