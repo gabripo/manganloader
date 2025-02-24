@@ -2,7 +2,7 @@
 
 ## Characteristics
 - download of raw images using [mloader](https://github.com/hurlenko/mloader)
-- EPUB generation through [KCC](https://github.com/ciromattia/kcc/tree/master)
+- EPUB / CBZ generation through [KCC](https://github.com/ciromattia/kcc/tree/master)
 - PDF generation through Pillow (yeah, easy there)
 
 ## Installation
