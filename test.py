@@ -7,7 +7,7 @@ if __name__ == '__main__':
     chapter_number = re.search(r'\d+', chapter_title).group()
     url = 'https://mangaplus.shueisha.co.jp/viewer/1023496'
     doc = Document(
-        chapter_nunber=chapter_number,
+        chapter_number=chapter_number,
         name=chapter_title,
         source_url=url,
         output_dir='output_docs',

@@ -7,7 +7,7 @@ from kcc.kindlecomicconverter import comic2ebook
 class Document:
     def __init__(
             self,
-            chapter_nunber: int,
+            chapter_number: str,
             name: str = None,
             source_url: str = None,
             output_dir: str = None,
@@ -91,7 +91,7 @@ class Document:
         ]
         self.output_dir = None
         self.working_dir = None
-        self.chapter_number = str(chapter_nunber)
+        self.chapter_number = chapter_number
         self.images = None
         self.set_name(name)
         self.set_url(source_url)
