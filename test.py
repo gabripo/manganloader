@@ -18,6 +18,8 @@ if __name__ == '__main__':
 
     doc_pdf = doc.build_from_url()
     message_pdf = f"Generated manga {os.path.basename(doc_pdf)} for {doc.get_device_name()} now available! ARRRWWW!"
+    doc.set_double_spread_version(want_double_spread_version=True)
+    doc.build_from_url()
 
     doc.set_type('epub')
     doc_epub = doc.build_from_url()

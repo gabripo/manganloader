@@ -17,6 +17,7 @@ class Document:
         self.name = None
         self.source_url = None
         self.type = None
+        self.double_spread_version = False
         self.supported_types = {
             'pdf',
             'epub',
@@ -104,6 +105,9 @@ class Document:
             print("Invalid URL!")
             return
         self.source_url = url
+
+    def set_double_spread_version(self, want_double_spread_version: bool = False):
+        self.double_spread_version = want_double_spread_version
 
     def set_type(self, document_type: str) -> None:
         if self._is_supported_type(document_type):
@@ -223,17 +227,58 @@ class Document:
         
         if images:
             pdf_name = self._new_pdf_name()
-            images[0].save(
-                pdf_name,
-                save_all = True,
-                append_images=images[1:],
-                resolution=100.0,
-            )
-            print(f"Generated PDF file: {pdf_name}")
+            self._merge_images_into_pdf(images, pdf_name)
+
+            if self.double_spread_version:
+                pdf_name_double_spreaded = os.path.join(
+                    self.output_dir,
+                    self.name + " double-spreaded.pdf"
+                )
+                images_double_spreaded = []
+                images_double_spreaded.append(images[0]) # skip the very 1-st page
+                for img_idx in range(1, len(images), 2):
+                    try:
+                        img_left = images[img_idx]
+                        img_right = images[img_idx+1]
+                        images_double_spreaded.append(self._merge_images_horizontal(img_right, img_left))
+                    except Exception as exc:
+                        # limit reached, storing the last image
+                        if 'img_left' in locals():
+                            images_double_spreaded.append(img_left)
+                        elif 'img_right' in locals():
+                            images_double_spreaded.append(img_right)
+                self._merge_images_into_pdf(images_double_spreaded, pdf_name_double_spreaded)
             return pdf_name
         else:
             print("No images available to generate the PDF!")
             return ''
+    
+    def _merge_images_horizontal(self, img_right: Image, img_left: Image, x_offset: int = 0):
+        images = (img_right, img_left)
+        widths, heights = zip(*(i.size for i in images))
+        merged_img_width = sum(widths)
+        merged_img_height = max(heights)
+
+        merged_img = Image.new('RGB', (merged_img_width, merged_img_height))
+        for img in images:
+            merged_img.paste(img, (x_offset, 0))
+            x_offset += img.size[0] # shift offset
+        
+        return merged_img
+    
+    @staticmethod
+    def _merge_images_into_pdf(
+        images: str,
+        pdf_name: str,
+        resolution: float = 100.0,
+        ):
+        images[0].save(
+                pdf_name,
+                save_all = True,
+                append_images=images[1:], # attach to the 1st page from the 2nd to the last page
+                resolution=resolution,
+            )
+        print(f"Generated PDF file: {pdf_name}")
 
     def _generate_ebook(self):
         input_folder_images = self._get_common_path_images()
