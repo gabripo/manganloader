@@ -15,9 +15,11 @@ if __name__ == '__main__':
     
     doc_pdf = doc.build_from_url()
     doc_pdf_name = os.path.basename(doc_pdf)
-    message_pdf = f"Generated manga {doc_pdf_name} now available! ARRRWWW!" # TODO insert link in the message
+    message_pdf = f"Generated manga {doc_pdf_name} now available! ARRRWWW!"
 
     doc.set_type('epub')
     doc_epub = doc.build_from_url()
     doc_epub_name = os.path.basename(doc_epub)
+    message_pdf = f"Generated manga {doc_epub_name} now available! ARRRWWW!"
+
     doc.clean_working_dir()
