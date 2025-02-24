@@ -101,7 +101,23 @@ class Document:
                 self.kcc_options[idx+1] = option_val
                 print(f"Option {option_name} for KCC set as {option_val} !")
                 return
-
+            
+    def get_kcc_option(self, option_name: str):
+        if option_name not in Document.valid_kcc_options.keys():
+            print(f"Invalid option {option_name} for KCC to search for!")
+            return ''
+        
+        for idx, opt in enumerate(self.kcc_options):
+            if opt == option_name:
+                if Document.valid_kcc_options[opt] is None:
+                    # single option
+                    return opt
+                if idx < len(self.kcc_options) - 1:
+                    # option with argument
+                    next_opt = self.kcc_options[idx+1]
+                    return next_opt
+        return ''
+                    
     def set_output_dir(self, output_dir: str):
         if output_dir is None:
             print("Invalid output directory specified!")
@@ -224,7 +240,7 @@ class Document:
             print(f"Invalid folder where to search files: {folder}")
         else:
             for file in os.listdir(folder):
-                if file.endswith(extension):
+                if file.endswith(extension) and not self._name_contains_profile(file):
                     full_file_path = os.path.abspath(os.path.join(folder, file))
                     if first_file_only:
                         return full_file_path
@@ -232,12 +248,16 @@ class Document:
                         files_with_extension.append(full_file_path)
         return files_with_extension
     
+    def _name_contains_profile(self, name: str):
+        return any(profile in name for profile in Document.valid_kcc_options['--profile'])
+    
     def _new_ebook_name(self, old_epub_name: str):
         doc_name = "MANGANAME" if self.name is None else self.name
         extensions = self._extract_extensions(old_epub_name)
+        device_name = self.get_kcc_option('--profile')
         return os.path.abspath(os.path.join(
             self.output_dir,
-            doc_name + "".join(extensions),
+            f"{doc_name} {device_name}" + "".join(extensions),
         ))
     
     @staticmethod

@@ -27,4 +27,9 @@ if __name__ == '__main__':
     doc_cbz_name = os.path.basename(doc_cbz)
     message_epub = f"Generated manga {doc_cbz_name} now available! ARRRWWW!"
 
+    doc.set_kcc_option('--profile', 'K11')
+    doc.build_from_url()
+    doc.set_type('epub')
+    doc.build_from_url()
+
     doc.clean_working_dir()
