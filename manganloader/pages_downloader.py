@@ -64,7 +64,7 @@ class Mangapage:
         retry = 1
         while response is None and retry <= MAX_RETRIES:
             try:
-                response = requests.get(url, verify=False) # we do not care about SSL
+                response = requests.get(url, verify=False, headers=HEADERS) # we do not care about SSL
                 return response
             except Exception as exc:
                 retry += 1
