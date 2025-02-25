@@ -21,6 +21,7 @@ class Document:
             'pdf',
             'epub',
             'cbz',
+            'raw',
         }
         Document.valid_kcc_options = {
             '--profile': {'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OTHER'},
@@ -188,6 +189,9 @@ class Document:
                 generated_doc = self._generate_pdf()
             elif self.type == 'epub' or self.type == 'cbz':
                 generated_doc = self._generate_ebook()
+            elif self.type == 'raw':
+                self._store_images()
+                return
             print(f"{self.type.upper()} document generation concluded: created file is {generated_doc}!")
             return generated_doc
         else:
@@ -409,3 +413,26 @@ class Document:
                         print(f"Argument {curr_arg} for option {opt} for KCC is invalid!")
                         return False
         return True
+    
+    def _store_images(self):
+        dest_folder = os.path.abspath(os.path.join(
+            self.output_dir,
+            self.name,
+        ))
+        if not os.path.exists(dest_folder):
+            os.makedirs(dest_folder)
+
+        self.images.sort()
+        for img_id, img_source in enumerate(self.images):
+            img_destination = os.path.abspath(os.path.join(
+                dest_folder,
+                "{:05}".format(img_id) + self._extract_extensions(os.path.basename(img_source))[0]
+            ))
+            try:
+                os.rename(
+                    img_source,
+                    img_destination
+                )
+            except Exception as exc:
+                print(f"Impossible to move {img_source} to {img_destination} : {exc}")
+        print(f"Images of {self.name} stored into {dest_folder} !")

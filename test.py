@@ -40,3 +40,6 @@ if __name__ == '__main__':
     doc.set_type('epub')
     doc_epub = doc.build_from_url()
     message_epub = f"Generated manga {os.path.basename(doc_epub)} for {doc.get_device_name()} now available! ARRRWWW!"
+
+    doc.set_type('raw')
+    doc.build_from_url()
