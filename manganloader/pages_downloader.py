@@ -1,5 +1,6 @@
 import os
 import requests
+import urllib
 import asyncio, aiohttp, aiofiles
 import time
 import re
@@ -27,7 +28,6 @@ class Mangapage:
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
         
-        output_folder = os.getcwd() if output_folder is None else output_folder
         if self._is_mangaplus_url(self.url):
             mloader = MloaderWrapper(output_directory=output_folder)
             chapter_number = self.get_chapter_id(self.url)
@@ -81,9 +81,29 @@ class Mangapage:
                 return
         soup = BeautifulSoup(response.text, 'html.parser')
         images_tags = soup.find_all('img')
-        images_urls = [image['src'] for image in images_tags]
+        images_urls = [
+            self._clean_image_url(image['src'])
+            for image in images_tags
+            ]
         return images_urls
     
+    @staticmethod
+    def _clean_image_url(img_url: str) -> str:
+        image_formats = {'.jpg', '.jpeg', '.png'}
+        img_url_parsed = urllib.parse.urlparse(img_url)
+        img_name, img_ext = os.path.splitext(img_url_parsed.path)
+        if img_ext not in image_formats:
+            return ''
+        return urllib.parse.urlunparse((
+            img_url_parsed.scheme,
+            img_url_parsed.netloc,
+            img_url_parsed.path,
+            '',
+            '',
+            '',
+            ))
+
+
     async def _write_images_from_urls(self, images_urls: list[str], output_folder: str):
         async with aiohttp.ClientSession() as session:
             tasks = [self._download_image(session, url, output_folder) for url in images_urls]
