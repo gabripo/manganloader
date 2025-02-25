@@ -50,6 +50,11 @@ class Document:
             '--spreadshift': None,
             '--norotate': None,
             '--reducerainbow': None,
+            '--customwidth': {},
+            '--customheight': {},
+        }
+        Document.custom_kcc_devices = {
+            'OBC': ('825', '1200'),
         }
         Document.profile_mapping = {
             'K1': "Kindle 1",
@@ -81,6 +86,7 @@ class Document:
             'Rmk1': "reMarkable 1",
             'Rmk2': "reMarkable 2",
             'RmkPP': "reMarkable Paper Pro",
+            'OBC': "ONYX BOOX Chronos",
             'OTHER': "Other",
         }
         self.kcc_options = [
@@ -129,13 +135,23 @@ class Document:
                 if option_name not in Document.valid_kcc_options.keys():
                     print(f"Invalid option {option_name} for KCC specified!")
                     return
-                if option_val not in Document.valid_kcc_options[option_name]:
+                if (option_val not in Document.valid_kcc_options[option_name]
+                    and
+                    (option_name == '--profile' and option_val not in Document.custom_kcc_devices.keys())):
                     print(f"Invalid option value {option_val} for option {option_name} for KCC specified!")
                     return
                 
                 self.kcc_options[idx+1] = option_val
                 print(f"Option {option_name} for KCC set as {option_val} !")
                 return
+        
+        if (option_name in Document.valid_kcc_options.keys()
+            and
+            option_name not in set(self.kcc_options)):
+            if option_val is None:
+                self.kcc_options.append(option_name)
+            else:
+                self.kcc_options.extend([option_name, option_val])
             
     def get_kcc_option(self, option_name: str):
         if option_name not in Document.valid_kcc_options.keys():
@@ -315,12 +331,21 @@ class Document:
         input_folder_images = self._get_common_path_images()
         self.set_kcc_option('--format', self.type.upper())
         if self._valid_kcc_options():
+            if self.get_kcc_option('--profile') in Document.custom_kcc_devices.keys():
+                custom_device = self.get_kcc_option('--profile')
+                self.set_kcc_option('--customwidth', Document.custom_kcc_devices[custom_device][0])
+                self.set_kcc_option('--customheight', Document.custom_kcc_devices[custom_device][1])
+                self.set_kcc_option('--profile', 'OTHER') # custom device name to use custom width and height
+
             comic2ebook.main([
                 *self.kcc_options,
                 '--output', self.output_dir,
                 input_folder_images,
                 ])
             
+            if 'custom_device' in locals():
+                self.set_kcc_option('--profile', custom_device) # restore original device name
+
             ebook_generated = self._get_file_names_with_extension(
                 self.output_dir,
                 os.path.basename(input_folder_images), # KCC stores the output with the name of the input folder
@@ -409,7 +434,9 @@ class Document:
                 valid_args_for_option = Document.valid_kcc_options[opt]
                 if valid_args_for_option is not None:
                     curr_arg = kcc_iterator.__next__() # jumps the argument
-                    if curr_arg not in valid_args_for_option:
+                    if (curr_arg not in valid_args_for_option
+                        and
+                        opt == '--profile' and curr_arg not in Document.custom_kcc_devices.keys()):
                         print(f"Argument {curr_arg} for option {opt} for KCC is invalid!")
                         return False
         return True

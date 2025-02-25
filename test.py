@@ -43,3 +43,7 @@ if __name__ == '__main__':
 
     doc.set_type('raw')
     doc.build_from_url()
+
+    doc.set_type('epub')
+    doc.set_kcc_option('--profile', 'OBC') # OBC is a custom device, not natively supported by KCC
+    doc.build_from_url()
