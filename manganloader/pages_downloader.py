@@ -128,12 +128,15 @@ class Mangapage:
 
     async def _write_images_from_urls(self, images_urls: list[str], output_folder: str):
         async with aiohttp.ClientSession() as session:
-            tasks = [self._download_image(session, url, output_folder) for url in images_urls]
+            tasks = [
+                self._download_image(session, url, output_folder, id)
+                for id, url in enumerate(images_urls)
+                ]
             img_paths = await asyncio.gather(*tasks)
             return img_paths
 
-    async def _download_image(self, session: aiohttp.ClientSession, img_url: str, output_folder: str):
-        img_name = os.path.basename(img_url)
+    async def _download_image(self, session: aiohttp.ClientSession, img_url: str, output_folder: str, image_id: int):
+        img_name = "{:05}".format(image_id) + "_" + os.path.basename(img_url)
         img_path = os.path.abspath(os.path.join(output_folder, img_name))
 
         session.headers.update(HEADERS)
