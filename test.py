@@ -11,9 +11,7 @@ if __name__ == '__main__':
     else:
         chapter_title = "One Piece 1061 colored (ENG)"
         url = 'https://ww11.readonepiece.com/index.php/chapter/one-piece-digital-colored-comics-chapter-1061/'
-    chapter_number = re.search(r'\d+', chapter_title).group()
     doc = Document(
-        chapter_number=chapter_number,
         name=chapter_title,
         source_url=url,
         output_dir='output_docs',
