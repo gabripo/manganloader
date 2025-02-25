@@ -227,7 +227,7 @@ class Document:
             pdf_name = self._new_pdf_name()
             self._merge_images_into_pdf(images, pdf_name)
 
-            if self.double_spread_version:
+            if self.double_spread_version and not self._are_images_double_spread(images):
                 pdf_name_double_spreaded = os.path.join(
                     self.output_dir,
                     self.name + " double-spreaded.pdf"
@@ -250,6 +250,22 @@ class Document:
         else:
             print("No images available to generate the PDF!")
             return ''
+        
+    @staticmethod
+    def _are_images_double_spread(images: list[Image]) -> bool:
+        image_sizes = [img.size for img in images]
+        num_img_landscape = 0
+        num_img_potrait = 0
+        for width, height in image_sizes:
+            if width > height:
+                num_img_landscape += 1
+            else:
+                num_img_potrait += 1
+        if num_img_landscape > num_img_potrait:
+            print("The images belong to an already double-spread manga, skipping the generation of a double-spread version")
+            return True
+        return False
+
     
     def _merge_images_horizontal(self, img_right: Image, img_left: Image, x_offset: int = 0):
         images = (img_right, img_left)
