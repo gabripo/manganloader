@@ -233,12 +233,21 @@ class Document:
                     self.name + " double-spreaded.pdf"
                 )
                 images_double_spreaded = []
-                images_double_spreaded.append(images[0]) # skip the very 1-st page
-                for img_idx in range(1, len(images), 2):
+                images_iter = images.__iter__()
+                images_double_spreaded.append(images_iter.__next__()) # skip the very 1-st page
+                for img_idx, img in enumerate(images_iter):
                     try:
-                        img_left = images[img_idx]
-                        img_right = images[img_idx+1]
-                        images_double_spreaded.append(self._merge_images_horizontal(img_right, img_left))
+                        img_left = img
+                        if self._is_image_landscape(img_left):
+                            images_double_spreaded.append(img_left)
+                            continue
+                        else:
+                            img_right = images_iter.__next__()
+                            if self._is_image_landscape(img_right):
+                                images_double_spreaded.append(img_left)
+                                images_double_spreaded.append(img_right)
+                                continue
+                            images_double_spreaded.append(self._merge_images_horizontal(img_right, img_left))
                     except Exception as exc:
                         # limit reached, storing the last image
                         if 'img_left' in locals():
@@ -265,6 +274,10 @@ class Document:
             print("The images belong to an already double-spread manga, skipping the generation of a double-spread version")
             return True
         return False
+    
+    @staticmethod
+    def _is_image_landscape(image: Image, scaling_difference: float = 1.1):
+        return image.width >= scaling_difference * image.height
 
     
     def _merge_images_horizontal(self, img_right: Image, img_left: Image, x_offset: int = 0):
