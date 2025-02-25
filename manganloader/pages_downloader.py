@@ -85,6 +85,7 @@ class Mangapage:
             self._clean_image_url(image['src'])
             for image in images_tags
             ]
+        images_urls = self._exclude_outlier_urls(images_urls)
         return images_urls
     
     @staticmethod
@@ -102,6 +103,21 @@ class Mangapage:
             '',
             '',
             ))
+    
+    def _exclude_outlier_urls(self, urls: list[str]) -> list[str]:
+        urls_netloc = [urllib.parse.urlparse(url).netloc for url in urls]
+        common_netloc = self._commonest_values(urls_netloc)
+        common_netloc = common_netloc[0] # prevent unlucky scenario with 2 netlocs with same frequencies
+        urls = [url for url in urls if common_netloc in url]
+        return urls
+    
+    @staticmethod
+    def _commonest_values(arr: list):
+        val_freq = {}
+        for val in arr:
+            val_freq[val] = val_freq.get(val, 0) + 1
+        max_freq = max(val_freq.values())
+        return [val for val, freq in val_freq.items() if freq == max_freq]
 
 
     async def _write_images_from_urls(self, images_urls: list[str], output_folder: str):
