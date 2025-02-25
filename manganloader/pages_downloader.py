@@ -141,7 +141,8 @@ class Mangapage:
             img_url: str,
             output_folder: str,
             image_id: int,
-            max_retries: int = MAX_RETRIES):
+            max_retries: int = MAX_RETRIES,
+            wait_time_s: float = 1.0):
         img_name = "{:05}".format(image_id) + "_" + os.path.basename(img_url)
         img_path = os.path.abspath(os.path.join(output_folder, img_name))
 
@@ -156,7 +157,8 @@ class Mangapage:
                 if attempts == max_retries:
                     print(f"Impossible to download image from url {img_url} !")
                     return ''   
-                print(f"Impossible to download image from url {img_url} ! Retry for the {attempts}-th time...")
+                print(f"Impossible to download image from url {img_url} ! Retry for the {attempts}-th time after {wait_time_s} seconds...")
+                time.sleep(wait_time_s)
             else:
                 break
 
