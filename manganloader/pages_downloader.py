@@ -8,11 +8,6 @@ from bs4 import BeautifulSoup
 from manganloader.mloader_wrapper import MloaderWrapper
 
 VALID_RESPONSE_STATUS = 200
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Referer": "https://imgur.com/",
-    }
 MAX_RETRIES = 5
 class Mangapage:
     def __init__(self, manga_url: str = None):
@@ -64,7 +59,11 @@ class Mangapage:
         retry = 1
         while response is None and retry <= max_retries:
             try:
-                response = requests.get(url, verify=False, headers=HEADERS) # we do not care about SSL
+                response = requests.get(
+                    url,
+                    verify=False, # we do not care about SSL
+                    headers=Mangapage._build_session_headers(url)
+                    )
                 return response
             except Exception as exc:
                 retry += 1
@@ -146,7 +145,7 @@ class Mangapage:
         img_name = "{:05}".format(image_id) + "_" + os.path.basename(img_url)
         img_path = os.path.abspath(os.path.join(output_folder, img_name))
 
-        session.headers.update(HEADERS)
+        session.headers.update(self._build_session_headers(img_url))
         attempts = 0
         while attempts < max_retries:
             async with session.get(img_url) as response:
@@ -166,6 +165,16 @@ class Mangapage:
             await f.write(content)
         print(f"Image stored from url {img_url} into {img_path} !")
         return img_path
+    
+    @staticmethod
+    def _build_session_headers(url: str) -> dict:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            }
+        if 'imgur' in url:
+            headers["Referer"] = "https://imgur.com/"
+        return headers
     
     @staticmethod
     def _is_mangaplus_url(url: str):
