@@ -7,6 +7,7 @@ import re
 from bs4 import BeautifulSoup
 from manganloader.mloader_wrapper import MloaderWrapper
 
+VALID_RESPONSE_STATUS = 200
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -76,7 +77,7 @@ class Mangapage:
         return int(url_split[-1])
     
     def _extract_images_urls(self, response):
-        if response is None or response.status_code != 200:
+        if response is None or response.status_code != VALID_RESPONSE_STATUS:
                 print(f"Impossible to fetch images from {self.url} !")
                 return
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -132,6 +133,10 @@ class Mangapage:
 
         async with session.get(img_url) as response:
             content = await response.read()
+
+        if not content or response.status != VALID_RESPONSE_STATUS:
+            print(f"Impossible to download image from url {img_url} !")
+            return ''
 
         async with aiofiles.open(img_path, "wb") as f:
             await f.write(content)
