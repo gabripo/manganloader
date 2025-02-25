@@ -24,6 +24,8 @@ class Mangapage:
             print("Invalid url, impossible to fetch images!")
             return
         output_folder = os.getcwd() if None else output_folder
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
         
         output_folder = os.getcwd() if output_folder is None else output_folder
         if self._is_mangaplus_url(self.url):
