@@ -2,10 +2,16 @@ import re
 import os
 from manganloader.docbuilder import Document
 
+OP_TEST = True
+
 if __name__ == '__main__':
-    chapter_title = "One Piece 1140 (ENG)"
+    if OP_TEST:
+        chapter_title = "One Piece 1140 (ENG)"
+        url = 'https://mangaplus.shueisha.co.jp/viewer/1023496'
+    else:
+        chapter_title = "One Piece 1061 colored (ENG)"
+        url = 'https://ww11.readonepiece.com/index.php/chapter/one-piece-digital-colored-comics-chapter-1061/'
     chapter_number = re.search(r'\d+', chapter_title).group()
-    url = 'https://mangaplus.shueisha.co.jp/viewer/1023496'
     doc = Document(
         chapter_number=chapter_number,
         name=chapter_title,
