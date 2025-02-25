@@ -90,7 +90,7 @@ class Mangapage:
 
     async def _download_image(self, session: aiohttp.ClientSession, img_url: str, output_folder: str):
         img_name = os.path.basename(img_url)
-        img_path = os.path.abspath(output_folder, img_name)
+        img_path = os.path.abspath(os.path.join(output_folder, img_name))
 
         async with session.get(img_url) as response:
             content = await response.read()
