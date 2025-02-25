@@ -316,9 +316,10 @@ class Document:
                 '--output', self.output_dir,
                 input_folder_images,
                 ])
-        
+            
             ebook_generated = self._get_file_names_with_extension(
                 self.output_dir,
+                os.path.basename(input_folder_images), # KCC stores the output with the name of the input folder
                 '.' + self.type,
                 first_file_only=True
                 )
@@ -347,6 +348,7 @@ class Document:
     def _get_file_names_with_extension(
             self,
             folder: str,
+            name: str,
             extension: str,
             first_file_only: False):
         files_with_extension = []
@@ -354,7 +356,7 @@ class Document:
             print(f"Invalid folder where to search files: {folder}")
         else:
             for file in os.listdir(folder):
-                if file.endswith(extension) and not self._name_contains_profile(file):
+                if name in file and file.endswith(extension) and not self._name_contains_profile(file):
                     full_file_path = os.path.abspath(os.path.join(folder, file))
                     if first_file_only:
                         return full_file_path
