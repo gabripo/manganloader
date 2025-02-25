@@ -13,6 +13,7 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Referer": "https://imgur.com/",
     }
+MAX_RETRIES = 5
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -58,11 +59,10 @@ class Mangapage:
         return re.match(regex, url) is not None
     
     @staticmethod
-    def fetch_webpage_response(url: str):
+    def fetch_webpage_response(url: str, max_retries: int = MAX_RETRIES):
         response = None
-        MAX_RETRIES = 10
         retry = 1
-        while response is None and retry <= MAX_RETRIES:
+        while response is None and retry <= max_retries:
             try:
                 response = requests.get(url, verify=False, headers=HEADERS) # we do not care about SSL
                 return response
@@ -135,17 +135,30 @@ class Mangapage:
             img_paths = await asyncio.gather(*tasks)
             return img_paths
 
-    async def _download_image(self, session: aiohttp.ClientSession, img_url: str, output_folder: str, image_id: int):
+    async def _download_image(
+            self,
+            session: aiohttp.ClientSession,
+            img_url: str,
+            output_folder: str,
+            image_id: int,
+            max_retries: int = MAX_RETRIES):
         img_name = "{:05}".format(image_id) + "_" + os.path.basename(img_url)
         img_path = os.path.abspath(os.path.join(output_folder, img_name))
 
         session.headers.update(HEADERS)
-        async with session.get(img_url) as response:
-            content = await response.read()
+        attempts = 0
+        while attempts < max_retries:
+            async with session.get(img_url) as response:
+                content = await response.read()
 
-        if not content or response.status != VALID_RESPONSE_STATUS:
-            print(f"Impossible to download image from url {img_url} !")
-            return ''
+            if not content or response.status != VALID_RESPONSE_STATUS:
+                attempts += 1
+                if attempts == max_retries:
+                    print(f"Impossible to download image from url {img_url} !")
+                    return ''   
+                print(f"Impossible to download image from url {img_url} ! Retry for the {attempts}-th time...")
+            else:
+                break
 
         async with aiofiles.open(img_path, "wb") as f:
             await f.write(content)
