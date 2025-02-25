@@ -8,6 +8,11 @@ from bs4 import BeautifulSoup
 from manganloader.mloader_wrapper import MloaderWrapper
 
 VALID_RESPONSE_STATUS = 200
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Referer": "https://imgur.com/",
+    }
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -131,6 +136,7 @@ class Mangapage:
         img_name = os.path.basename(img_url)
         img_path = os.path.abspath(os.path.join(output_folder, img_name))
 
+        session.headers.update(HEADERS)
         async with session.get(img_url) as response:
             content = await response.read()
 
