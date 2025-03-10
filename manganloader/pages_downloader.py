@@ -76,7 +76,6 @@ class Mangapage:
     
     @staticmethod
     def get_chapter_id(url: str):
-        # TODO intelligent search for non-Mangaplus urls
         if Mangapage._is_mangaplus_url(url):
             url_split = url.split('/')
             return int(url_split[-1])
