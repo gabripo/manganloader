@@ -77,8 +77,39 @@ class Mangapage:
     @staticmethod
     def get_chapter_id(url: str):
         # TODO intelligent search for non-Mangaplus urls
-        url_split = url.split('/')
-        return int(url_split[-1])
+        if Mangapage._is_mangaplus_url(url):
+            url_split = url.split('/')
+            return int(url_split[-1])
+        else:
+            print(f"The url {url} is not a valid Mangaplus one! The url of the latest chapter will be used!")
+            return Mangapage.fetch_id_latest_chapter()
+
+    @staticmethod
+    def fetch_num_latest_chapter():
+        latest_chapters = Mangapage.fetch_latest_chapters()
+        return max(latest_chapters.keys())
+
+    @staticmethod
+    def fetch_id_latest_chapter():
+        latest_chapters = Mangapage.fetch_latest_chapters()
+        return latest_chapters[Mangapage.fetch_num_latest_chapter()]
+    
+    @staticmethod
+    def fetch_url_latest_chapter():
+        id_latest_chapter = Mangapage.fetch_id_latest_chapter()
+        return f"https://mangaplus.shueisha.co.jp/viewer/{id_latest_chapter}"
+    
+    @staticmethod
+    def fetch_latest_chapters():
+        url = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
+        response = Mangapage.fetch_webpage_response(url=url)
+        if response.status_code != 200:
+            print(f"Response of the url {url} is invalid! The latest chapters were not fetched!")
+            return {}
+        chapter_nums = re.findall("#(\\d+)", response.text)
+        chapter_ids = re.findall("chapter/(\\d+)/chapter_thumbnail", response.text)
+        chapters = {ch_num: ch_id for ch_num, ch_id in zip(chapter_nums, chapter_ids)}
+        return chapters
     
     def _extract_images_urls(self, response):
         if response is None or response.status_code != VALID_RESPONSE_STATUS:

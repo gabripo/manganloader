@@ -107,8 +107,8 @@ class Document:
     
     def set_url(self, url: str) -> None:
         if url is None or not Mangapage.is_valid_url(url):
-            print("Invalid URL!")
-            return
+            print("Url not specified! The latest chapter will be used.")
+            url = Mangapage.fetch_url_latest_chapter()
         self.source_url = url
 
     def set_double_spread_version(self, want_double_spread_version: bool = False):
@@ -188,8 +188,9 @@ class Document:
 
     def set_name(self, name: str):
         if name is None:
-            print("Invalid name for the manga!")
-            return
+            print("Invalid name for the manga! The latest chapter name will be used.")
+            num_latest_chapter = Mangapage.fetch_num_latest_chapter()
+            name = f"One Piece {num_latest_chapter} (ENG)"
         self.name = name
     
     def get_supported_types(self):

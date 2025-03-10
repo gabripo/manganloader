@@ -3,11 +3,16 @@ import os
 from manganloader.docbuilder import Document
 
 OP_TEST = True
+OP_LATEST_CHAPTER = True
 
 if __name__ == '__main__':
     if OP_TEST:
-        chapter_title = "One Piece 1140 (ENG)"
-        url = 'https://mangaplus.shueisha.co.jp/viewer/1023496'
+        if OP_LATEST_CHAPTER:
+            chapter_title = None
+            url = None
+        else:
+            chapter_title = "One Piece 1140 (ENG)"
+            url = 'https://mangaplus.shueisha.co.jp/viewer/1023496'
     else:
         chapter_title = "One Piece 1061 colored (ENG)"
         url = 'https://ww11.readonepiece.com/index.php/chapter/one-piece-digital-colored-comics-chapter-1061/'
