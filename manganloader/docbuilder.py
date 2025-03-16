@@ -182,6 +182,8 @@ class Document:
         if working_dir is None:
             self.working_dir = os.path.abspath(os.path.join(os.getcwd(), "temp"))
             print(f"Working directory not specified, using {self.working_dir} ...")
+        else:
+            self.working_dir = working_dir
         
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
