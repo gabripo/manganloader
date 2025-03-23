@@ -257,7 +257,9 @@ class Document:
                 )
                 images_double_spreaded = []
                 images_iter = images.__iter__()
-                images_double_spreaded.append(images_iter.__next__()) # skip the very 1-st page
+                if len(images) % 2 != 0:
+                    # if the number of pages is odd, assume double-spread for all the pages except for the 1-st page
+                    images_double_spreaded.append(images_iter.__next__()) # skip the very 1-st page
                 for img_idx, img in enumerate(images_iter):
                     try:
                         img_left = img
