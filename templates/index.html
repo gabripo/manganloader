@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Dropdown Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>MANGANLOADER</h1>
+        <form id="options-form">
+            <label for="manga-dropdown">Manga:</label>
+            <select id="manga-dropdown">
+                <option value="">-</option>
+                <option value="onepiece_bw">One Piece</option>
+                <option value="onepiece_col">One Piece (colored)</option>
+                <option value="dbs_bw">Dragon Ball Super</option>
+                <option value="dbs_col">Dragon Ball Super (colored)</option>
+            </select>
+
+            <div id="source-dropdown-container" style="display: none;">
+                <label for="source-dropdown">Source:</label>
+                <select id="source-dropdown">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+
+            <label for="format-dropdown">Target file format:</label>
+            <select id="format-dropdown">
+                <option value="pdf">PDF</option>
+                <option value="epub">EPUB</option>
+                <option value="raw">RAW (images)</option>
+            </select>
+
+            <label for="number-input">Number of latest chapters to download:</label>
+            <input type="number" id="number-input" name="number-input" value="1" min="1" required>
+
+            <button type="button" id="download-button" disabled>Download</button>
+        </form>
+    </div>
+
+    <script>
+        const secondDropdownOptions = {
+            onepiece_bw: ['mangaplus'],
+            onepiece_col: ['readonepiece'],
+            dbs_bw: ['dbsmanga_bw'],
+            dbs_col: ['dbsmanga_col'],
+        };
+
+        function populateSecondDropdown() {
+            const firstDropdown = document.getElementById('manga-dropdown');
+            const secondDropdown = document.getElementById('source-dropdown');
+            const secondDropdownContainer = document.getElementById('source-dropdown-container');
+            const selectedOption = firstDropdown.value;
+
+            // clear previous options
+            secondDropdown.innerHTML = '<option value="">-</option>';
+
+            if (selectedOption) {
+                secondDropdownContainer.style.display = 'block';
+                // Populate second dropdown based on the selected option
+                secondDropdownOptions[selectedOption].forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    secondDropdown.appendChild(opt);
+                });
+            } else {
+                secondDropdownContainer.style.display = 'none';
+            }
+
+            // select the first available option
+            if (secondDropdown.options.length > 1) {
+                secondDropdown.selectedIndex = 1;
+            }
+            sendOptionsToBackend();
+            validateOptions();
+        }
+
+        function validateOptions() {
+            const firstOption = document.getElementById('manga-dropdown').value;
+            const secondOption = document.getElementById('source-dropdown').value;
+            const numberField = document.getElementById('number-input').value;
+            const downloadButton = document.getElementById('download-button');
+
+            var mangaValid = firstOption && firstOption != "-"
+            var sourceValid = secondOption && secondOption != "-"
+            var numberValid = !isNaN(numberField) && numberField >= 0
+            if (mangaValid && sourceValid && numberValid) {
+                downloadButton.disabled = false;
+                downloadButton.style.display = 'inline-block';
+                // alert("enabled");
+            } else {
+                downloadButton.disabled = true;
+                downloadButton.style.display = 'none';
+                // alert("disabled");
+            }
+        }
+
+        function sendOptionsToBackend() {
+            const manga = document.getElementById('manga-dropdown').value;
+            const source = document.getElementById('source-dropdown').value;
+            const numChaptersToDownload = document.getElementById('number-input').value;
+            const format = document.getElementById('format-dropdown').value;
+
+            if (manga && source) {
+                fetch('/update_options', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ manga, source, numChaptersToDownload, format })
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            console.log("Options updated successfully");
+                        }
+                    }).catch(error => console.error('Error updating options:', error));
+            }
+        }
+
+        document.getElementById('number-input').addEventListener('change', function () {
+            const numberField = document.getElementById('number-input');
+            if (numberField.value < 1) {
+                numberField.value = 1;
+            }
+            sendOptionsToBackend();
+        });
+
+        document.getElementById('manga-dropdown').addEventListener('change', function () {
+            populateSecondDropdown();
+            sendOptionsToBackend();
+        });
+
+        document.getElementById('source-dropdown').addEventListener('change', function () {
+            sendOptionsToBackend();
+            validateOptions();
+        });
+
+        document.getElementById('format-dropdown').addEventListener('change', function () {
+            sendOptionsToBackend();
+            validateOptions();
+        });
+
+        document.getElementById('download-button').addEventListener('click', function () {
+            sendOptionsToBackend();
+            fetch('/download', {
+                method: 'POST'
+            }).then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'download.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                }).catch(error => console.error('Error downloading the file:', error));
+        });
+
+        // Populate the second dropdown on page load
+        window.addEventListener('load', function () {
+            populateSecondDropdown();
+        });
+    </script>
+</body>
+
+</html>

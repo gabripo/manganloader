@@ -468,3 +468,23 @@ class Document:
             except Exception as exc:
                 print(f"Impossible to move {img_source} to {img_destination} : {exc}")
         print(f"Images of {self.name} stored into {dest_folder} !")
+
+def batch_download_chapters(
+        chapters_links: list[str],
+        use_color: bool = False,
+        prefix: str = "chapter_",
+        output_dir: str = "output",
+        output_format: str = "pdf",
+        ):
+    for id, link in enumerate(chapters_links):
+        chapter_name = prefix + "{:05}".format(len(chapters_links)-id)
+        d = Document(
+            name=chapter_name,
+            source_url=link,
+            output_dir=output_dir,
+            document_type=output_format,
+        )
+        d.set_working_dir(os.path.join(d.working_dir, chapter_name))
+        if use_color:
+            d.set_kcc_option('--forcecolor')
+        d.build_from_url()

@@ -17,3 +17,6 @@ mozjpeg_lossless_optimization==1.1.5
 numpy==2.2.3
 distro==1.9.0
 packaging==24.2
+
+# flask app
+flask==3.1.0

@@ -9,6 +9,7 @@ from manganloader.mloader_wrapper import MloaderWrapper
 
 VALID_RESPONSE_STATUS = 200
 MAX_RETRIES = 5
+MANGAPLUS_OP_URL = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -94,13 +95,17 @@ class Mangapage:
         return latest_chapters[Mangapage.fetch_num_latest_chapter()]
     
     @staticmethod
+    def build_url_from_id_chapter(id_chapter: str):
+        return f"https://mangaplus.shueisha.co.jp/viewer/{id_chapter}"
+    
+    @staticmethod
     def fetch_url_latest_chapter():
         id_latest_chapter = Mangapage.fetch_id_latest_chapter()
-        return f"https://mangaplus.shueisha.co.jp/viewer/{id_latest_chapter}"
+        return Mangapage.build_url_from_id_chapter(id_latest_chapter)
     
     @staticmethod
     def fetch_latest_chapters():
-        url = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
+        url = MANGAPLUS_OP_URL
         response = Mangapage.fetch_webpage_response(url=url)
         if response.status_code != 200:
             print(f"Response of the url {url} is invalid! The latest chapters were not fetched!")
@@ -109,6 +114,32 @@ class Mangapage:
         chapter_ids = re.findall("chapter/(\\d+)/chapter_thumbnail", response.text)
         chapters = {ch_num: ch_id for ch_num, ch_id in zip(chapter_nums, chapter_ids)}
         return chapters
+    
+    @staticmethod
+    def fetch_latest_chapters_generic(url: str = None, base_url: str = None):
+        if base_url is None and url == MANGAPLUS_OP_URL:
+            print("Fetching the latest One Piece chapters from Mangaplus...")
+            chapters_num_id = Mangapage.fetch_latest_chapters()
+            chapters_links = [Mangapage.build_url_from_id_chapter(ch_id) for ch_id in chapters_num_id.values()]
+            return chapters_links
+        if url is None or base_url is None:
+            print(f"Invalid combination of url and base url specified: impossible to fetch the latest chapters. Fallback to One Piece colored.")
+            url = 'https://ww11.readonepiece.com/index.php/manga/one-piece-digital-colored-comics/'
+            base_url = 'https://ww11.readonepiece.com/index.php/chapter/'
+
+        response = Mangapage.fetch_webpage_response(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        links = [a.get('href') for a in soup.find_all('a', href=True)]
+
+        seen = set()
+        chapters_links = []
+        for link in links:
+            if base_url not in link:
+                continue
+            if link not in seen:
+                seen.add(link)
+                chapters_links.append(link)
+        return chapters_links
     
     def _extract_images_urls(self, response):
         if response is None or response.status_code != VALID_RESPONSE_STATUS:
