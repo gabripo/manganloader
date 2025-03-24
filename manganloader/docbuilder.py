@@ -253,7 +253,7 @@ class Document:
             if self.double_spread_version and not self._are_images_double_spread(images):
                 pdf_name_double_spreaded = os.path.join(
                     self.output_dir,
-                    self.name + " double-spreaded.pdf"
+                    self.name + " double-spread.pdf"
                 )
                 images_double_spreaded = []
                 images_iter = images.__iter__()
