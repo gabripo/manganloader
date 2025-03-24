@@ -82,7 +82,7 @@ def DownloadBackend(
         chapters_links=chapters_links,
         use_color=source_colored,
         prefix=manga,
-        output_dir="output",
+        output_dir=output_dir,
         output_format=format,
         )
 
