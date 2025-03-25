@@ -89,6 +89,8 @@ def DownloadBackend(
 @app.route('/download', methods=['POST'])
 def download():
     output_dir = os.path.abspath(os.path.join(os.getcwd(), 'output'))
+    shutil.rmtree(output_dir)
+
     DownloadBackend(
         manga=options['manga'],
         source=options['source'],
@@ -104,8 +106,6 @@ def download():
                 file_path = os.path.join(root, file)
                 zf.write(file_path, os.path.relpath(file_path, output_dir))
     memory_file.seek(0)
-
-    shutil.rmtree(output_dir)
 
     zip_file_name = f"{options['manga']}_{options['num_chapters_to_download']}_{options['source']}_{options['format']}" + '.zip'
     return send_file(
