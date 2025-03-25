@@ -89,7 +89,7 @@ def DownloadBackend(
 @app.route('/download', methods=['POST'])
 def download():
     output_dir = os.path.abspath(os.path.join(os.getcwd(), 'output'))
-    shutil.rmtree(output_dir)
+    shutil.rmtree(output_dir, ignore_errors=True)
 
     DownloadBackend(
         manga=options['manga'],
