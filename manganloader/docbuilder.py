@@ -475,6 +475,7 @@ def batch_download_chapters(
         prefix: str = "chapter_",
         output_dir: str = "output",
         output_format: str = "pdf",
+        delete_temporary_files: bool = True,
         ):
     for id, link in enumerate(chapters_links):
         chapter_name = prefix + "{:05}".format(len(chapters_links)-id)
@@ -488,3 +489,5 @@ def batch_download_chapters(
         if use_color:
             d.set_kcc_option('--forcecolor')
         d.build_from_url()
+        if delete_temporary_files:
+            d.clean_working_dir()
