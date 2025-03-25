@@ -99,21 +99,31 @@ def download():
         output_dir=output_dir,
         )
 
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, 'w') as zf:
-        for root, dirs, files in os.walk(output_dir):
-            for file in files:
-                file_path = os.path.join(root, file)
-                zf.write(file_path, os.path.relpath(file_path, output_dir))
-    memory_file.seek(0)
+    entries = os.listdir(output_dir)
+    files = [os.path.join(output_dir, entry) for entry in entries if os.path.isfile(os.path.join(output_dir, entry))]
+    if len(files) == 1:
+        single_file = files[0]
+        return send_file(
+            single_file,
+            as_attachment=True,
+            download_name=os.path.basename(single_file),
+        )
+    else:
+        memory_file = io.BytesIO()
+        with zipfile.ZipFile(memory_file, 'w') as zf:
+            for root, dirs, files in os.walk(output_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zf.write(file_path, os.path.relpath(file_path, output_dir))
+        memory_file.seek(0)
 
-    zip_file_name = f"{options['manga']}_{options['num_chapters_to_download']}_{options['source']}_{options['format']}" + '.zip'
-    return send_file(
-        memory_file,
-        as_attachment=True,
-        download_name=zip_file_name,
-        mimetype='application/zip'
-    )
+        zip_file_name = f"{options['manga']}_{options['num_chapters_to_download']}_{options['source']}_{options['format']}" + '.zip'
+        return send_file(
+            memory_file,
+            as_attachment=True,
+            download_name=zip_file_name,
+            mimetype='application/zip'
+        )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
