@@ -5,11 +5,16 @@ import asyncio, aiohttp, aiofiles
 import time
 import re
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from manganloader.mloader_wrapper import MloaderWrapper
 
 VALID_RESPONSE_STATUS = 200
 MAX_RETRIES = 5
 MANGAPLUS_OP_URL = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
+SELENIUM_LOAD_TIME_S = 1
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -23,7 +28,7 @@ class Mangapage:
             return
         self.url = url
 
-    def fetch_images(self, output_folder: str = None):
+    def fetch_images(self, output_folder: str = None, use_javascript: bool = False):
         if self.url is None:
             print("Invalid url, impossible to fetch images!")
             return
@@ -37,8 +42,27 @@ class Mangapage:
             self.images = mloader.download_chapters(chapter_number)
         else:
             # fallback to normal webpage scraping
-            response = self.fetch_webpage_response(self.url)
-            images_urls = self._extract_images_urls(response)
+            if use_javascript:
+                # webpage scraping with Javascript
+                try:
+                    driver = webdriver.Chrome(
+                            service=ChromeService(ChromeDriverManager().install()),
+                        )
+                    
+                    driver.get(self.url)
+                    time.sleep(SELENIUM_LOAD_TIME_S)
+                    
+                    images_selenium = driver.find_elements(By.TAG_NAME, 'img')
+                    images_urls = [l.get_attribute('src') for l in images_selenium]
+                except Exception as exc:
+                    print(f"Impossible to fetch images from the url {self.url} : {exc}")
+                    images_urls = []
+                finally:
+                    driver.quit()
+            else:
+                # static webpage scraping
+                response = self.fetch_webpage_response(self.url)
+                images_urls = self._extract_images_urls(response)
             self.images = asyncio.run(self._write_images_from_urls(images_urls, output_folder))
         return self.images
 
@@ -116,7 +140,11 @@ class Mangapage:
         return chapters
     
     @staticmethod
-    def fetch_latest_chapters_generic(url: str = None, base_url: str = None):
+    def fetch_latest_chapters_generic(
+        url: str = None,
+        base_url: str = None,
+        javascript_args: dict = {},
+        ):
         if base_url is None and url == MANGAPLUS_OP_URL:
             print("Fetching the latest One Piece chapters from Mangaplus...")
             chapters_num_id = Mangapage.fetch_latest_chapters()
@@ -127,9 +155,37 @@ class Mangapage:
             url = 'https://ww11.readonepiece.com/index.php/manga/one-piece-digital-colored-comics/'
             base_url = 'https://ww11.readonepiece.com/index.php/chapter/'
 
-        response = Mangapage.fetch_webpage_response(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        links = [a.get('href') for a in soup.find_all('a', href=True)]
+        if javascript_args:
+            # rendering with Javascript
+            try:
+                driver = webdriver.Chrome(
+                    service=ChromeService(ChromeDriverManager().install()),
+                )
+                driver.get(url)
+                time.sleep(SELENIUM_LOAD_TIME_S)
+
+                if 'buttons' in javascript_args.keys():
+                    buttons_to_press = javascript_args['buttons']
+                    for button_name in buttons_to_press:
+                        button = driver.find_element(
+                            By.XPATH,
+                            f"//button[contains(text(), '{button_name}')]",
+                        )
+                        button.click()
+                        time.sleep(SELENIUM_LOAD_TIME_S)
+                
+                links_selenium = driver.find_elements(By.TAG_NAME, 'a')
+                links = [l.get_attribute('href') for l in links_selenium]
+            except Exception as exc:
+                print(f"Impossible to fetch links from the url {url} : {exc}")
+                links = []
+            finally:
+                driver.quit()
+        else:
+            # static rendering without Javascript
+            response = Mangapage.fetch_webpage_response(url)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            links = [a.get('href') for a in soup.find_all('a', href=True)]
 
         seen = set()
         chapters_links = []

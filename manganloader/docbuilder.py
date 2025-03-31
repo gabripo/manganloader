@@ -199,10 +199,10 @@ class Document:
     def get_supported_types(self):
         return self.supported_types
 
-    def build_from_url(self):
+    def build_from_url(self, use_javascript: bool = False):
         if self._is_supported_type(self.type):
             page = Mangapage(self.source_url)
-            self.images = page.fetch_images(self.working_dir)
+            self.images = page.fetch_images(self.working_dir, use_javascript)
 
             print(f"Generating {self.type} document from {self.source_url}...")
             if self.type == 'pdf':
@@ -478,6 +478,7 @@ def batch_download_chapters(
         output_format: str = "pdf",
         delete_temporary_files: bool = True,
         gen_double_spread: bool = False,
+        use_javascript: bool = False,
         ):
     for id, link in enumerate(chapters_links):
         chapter_name = prefix + "{:05}".format(len(chapters_links)-id)
@@ -495,7 +496,7 @@ def batch_download_chapters(
         if gen_double_spread:
             d.set_double_spread_version(gen_double_spread)
 
-        d.build_from_url()
+        d.build_from_url(use_javascript=use_javascript)
 
         if gen_double_spread:
             generated_files = os.listdir(d.output_dir)
