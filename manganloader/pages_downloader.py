@@ -51,6 +51,10 @@ class Mangapage:
                     
                     driver.get(self.url)
                     time.sleep(SELENIUM_LOAD_TIME_S)
+
+                    # ensure lazy-loaded images are there
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(SELENIUM_LOAD_TIME_S)
                     
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
                     images_urls = [l.get_attribute('src') for l in images_selenium]
