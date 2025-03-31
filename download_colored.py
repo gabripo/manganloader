@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # url = 'https://ww9.dbsmanga.com/manga/dragon-ball-super/'
     url = 'https://ww9.dbsmanga.com/manga/dragon-ball-super-colored/'
     base_url = 'https://ww9.dbsmanga.com/chapter/'
-    chapters_links = Mangapage.fetch_id_latest_chapter(
+    chapters_links = Mangapage.fetch_latest_chapters_generic(
         url=url,
         base_url=base_url,
     )
