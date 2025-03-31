@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import StaleElementReferenceException
 from manganloader.mloader_wrapper import MloaderWrapper
 
 VALID_RESPONSE_STATUS = 200
@@ -45,19 +46,48 @@ class Mangapage:
             if use_javascript:
                 # webpage scraping with Javascript
                 try:
+                    chrome_options = webdriver.ChromeOptions()
+                    chrome_options.add_experimental_option("prefs", {
+                        "download.default_directory": output_folder,
+                        "download.prompt_for_download": False,
+                        "download.directory_upgrade": True,
+                        "safebrowsing.enabled": True,
+                        "profile.default_content_setting_values.automatic_downloads": 1,
+                        "profile.default_content_setting_values.popups": 0,
+                    })
                     driver = webdriver.Chrome(
                             service=ChromeService(ChromeDriverManager().install()),
+                            options=chrome_options,
                         )
                     
                     driver.get(self.url)
                     time.sleep(SELENIUM_LOAD_TIME_S)
 
-                    # ensure lazy-loaded images are there
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(SELENIUM_LOAD_TIME_S)
-                    
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
                     images_urls = [l.get_attribute('src') for l in images_selenium]
+
+                    for index, img_url in enumerate(images_urls):
+                        if img_url:
+                            attempts = 0
+                            while attempts < 5:
+                                try:
+                                    # use javaScript to create a link and trigger a download
+                                    driver.execute_script(f"""
+                                        var link = document.createElement('a');
+                                        link.href = '{img_url}';
+                                        link.download = 'image_{index}.png';
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    """)
+                                    if os.path.exists(os.path.join(output_folder, f'image_{index}.png')):
+                                        break
+                                    else:
+                                        attempts += 1
+                                except StaleElementReferenceException:
+                                    attempts += 1
+                                    continue
+
                 except Exception as exc:
                     print(f"Impossible to fetch images from the url {self.url} : {exc}")
                     images_urls = []
@@ -67,7 +97,7 @@ class Mangapage:
                 # static webpage scraping
                 response = self.fetch_webpage_response(self.url)
                 images_urls = self._extract_images_urls(response)
-            self.images = asyncio.run(self._write_images_from_urls(images_urls, output_folder))
+                self.images = asyncio.run(self._write_images_from_urls(images_urls, output_folder))
         return self.images
 
     @staticmethod
@@ -295,6 +325,19 @@ class Mangapage:
             }
         if 'imgur' in url:
             headers["Referer"] = "https://imgur.com/"
+        if 'lastation' in url:
+            headers = {
+                "Host" : "scans.lastation.us",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0",
+                "Accept" : "image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5",
+                "Accept-Language" : "en-GB,en;q=0.5",
+                "Accept-Encoding" : "gzip, deflate, br, zstd",
+                "Referer" : "https://weebcentral.com/",
+                "Sec-Fetch-Dest" : "image",
+                "Sec-Fetch-Mode" : "no-cors",
+                "Sec-Fetch-Site" : "cross-site",
+                "Connection" : "keep-alive",
+            }
         return headers
     
     @staticmethod
