@@ -13,6 +13,7 @@ options = {
     'source': None,
     'num_chapters_to_download': 1,
     'format': 'PDF',
+    'gen_double_spread': False,
 }
 source_list = {
     'mangaplus': {
@@ -52,6 +53,7 @@ def update_options():
     options['source'] = data.get('source')
     options['num_chapters_to_download'] = int(data.get('numChaptersToDownload'))
     options['format'] = data.get('format')
+    options['gen_double_spread'] = data.get('generateDoubleSpread')
 
     return jsonify({"status": "success"})
 
@@ -61,6 +63,7 @@ def DownloadBackend(
         num_chapters: int,
         format: str,
         output_dir: str,
+        gen_double_spread: bool,
         ):
     print(f"Manga: {manga}, Source: {source}, Num chapters to download: {num_chapters}, Format: {format}, Output folder: ")
     source_dict = source_list.get(source, None)
@@ -84,6 +87,7 @@ def DownloadBackend(
         prefix=manga,
         output_dir=output_dir,
         output_format=format,
+        gen_double_spread=gen_double_spread,
         )
 
 @app.route('/download', methods=['POST'])
@@ -97,6 +101,7 @@ def download():
         num_chapters=options['num_chapters_to_download'],
         format=options['format'],
         output_dir=output_dir,
+        gen_double_spread=options['gen_double_spread'],
         )
 
     entries = os.listdir(output_dir)

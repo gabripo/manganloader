@@ -17,6 +17,7 @@ class Document:
         self.source_url = None
         self.type = None
         self.double_spread_version = False
+        self.double_spread_suffix = " double-spread.pdf"
         self.supported_types = {
             'pdf',
             'epub',
@@ -253,7 +254,7 @@ class Document:
             if self.double_spread_version and not self._are_images_double_spread(images):
                 pdf_name_double_spreaded = os.path.join(
                     self.output_dir,
-                    self.name + " double-spread.pdf"
+                    self.name + self.double_spread_suffix
                 )
                 images_double_spreaded = []
                 images_iter = images.__iter__()
@@ -476,6 +477,7 @@ def batch_download_chapters(
         output_dir: str = "output",
         output_format: str = "pdf",
         delete_temporary_files: bool = True,
+        gen_double_spread: bool = False,
         ):
     for id, link in enumerate(chapters_links):
         chapter_name = prefix + "{:05}".format(len(chapters_links)-id)
@@ -486,8 +488,28 @@ def batch_download_chapters(
             document_type=output_format,
         )
         d.set_working_dir(os.path.join(d.working_dir, chapter_name))
+
         if use_color:
             d.set_kcc_option('--forcecolor')
+
+        if gen_double_spread:
+            d.set_double_spread_version(gen_double_spread)
+
         d.build_from_url()
+
+        if gen_double_spread:
+            generated_files = os.listdir(d.output_dir)
+
+            non_double_spread_files = [
+                os.path.join(d.output_dir, f) for f in generated_files
+                if f.endswith('.pdf') and not f.endswith(d.double_spread_suffix)
+            ]
+
+            for pdf_file_to_delete in non_double_spread_files:
+                try:
+                    os.remove(pdf_file_to_delete)
+                except Exception as exc:
+                    print(f"Error while deleting file {pdf_file_to_delete} : {exc}")
+
         if delete_temporary_files:
             d.clean_working_dir()
