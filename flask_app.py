@@ -58,6 +58,18 @@ source_list = {
         },
         'javascript_args_chapter': {},
         },
+    'mangatoto_dbs_col': {
+        'url': 'https://mangatoto.net/title/86383',
+        'base_url': 'https://mangatoto.net/title/86383-dragon-ball-super-digital-colored-official-tl-overlaid/',
+        'has_color': True,
+        'reverse_order': False,
+        'javascript_args_mainpage': {
+            'buttons_xpath': ['/html/body/div/main/div[3]/astro-island/div/div[1]/div[1]/span'],
+        },
+        'javascript_args_chapter': {
+            'buttons': ['load all pages'],
+        },
+        },
 }
 
 @app.route('/')
@@ -90,6 +102,7 @@ def DownloadBackend(
         return
     source_colored = source_dict.pop('has_color', False)
     reverse_order = source_dict.pop('reverse_order', False)
+    javascript_args_chapter = source_dict.pop('javascript_args_chapter', {})
     
     chapters_links = Mangapage.fetch_latest_chapters_generic(**source_dict)
     if len(chapters_links) < num_chapters:
@@ -99,7 +112,6 @@ def DownloadBackend(
     else:
         chapters_links = chapters_links[:num_chapters]
 
-    use_javascript = source_dict.get('javascript_args_mainpage', {}) != {}
     batch_download_chapters(
         chapters_links=chapters_links,
         use_color=source_colored,
@@ -107,7 +119,7 @@ def DownloadBackend(
         output_dir=output_dir,
         output_format=format,
         gen_double_spread=gen_double_spread,
-        use_javascript=use_javascript,
+        javascript_args_chapter=javascript_args_chapter,
         )
 
 @app.route('/download', methods=['POST'])

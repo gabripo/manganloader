@@ -201,7 +201,7 @@ class Mangapage:
     def fetch_latest_chapters_generic(
         url: str = None,
         base_url: str = None,
-        javascript_args: dict = {},
+        javascript_args_mainpage: dict = {},
         ):
         if base_url is None and url == MANGAPLUS_OP_URL:
             print("Fetching the latest One Piece chapters from Mangaplus...")
@@ -213,7 +213,7 @@ class Mangapage:
             url = 'https://ww11.readonepiece.com/index.php/manga/one-piece-digital-colored-comics/'
             base_url = 'https://ww11.readonepiece.com/index.php/chapter/'
 
-        if javascript_args:
+        if javascript_args_mainpage:
             # rendering with Javascript
             try:
                 driver = webdriver.Chrome(
@@ -222,8 +222,8 @@ class Mangapage:
                 driver.get(url)
                 time.sleep(SELENIUM_LOAD_TIME_S)
 
-                if 'buttons' in javascript_args.keys():
-                    buttons_to_press = javascript_args['buttons']
+                if 'buttons' in javascript_args_mainpage.keys():
+                    buttons_to_press = javascript_args_mainpage['buttons']
                     for button_name in buttons_to_press:
                         button = driver.find_element(
                             By.XPATH,
@@ -232,8 +232,8 @@ class Mangapage:
                         button.click()
                         time.sleep(SELENIUM_LOAD_TIME_S)
                 
-                if 'buttons_xpath' in javascript_args.keys():
-                    buttons_xpath_to_press = javascript_args['buttons_xpath']
+                if 'buttons_xpath' in javascript_args_mainpage.keys():
+                    buttons_xpath_to_press = javascript_args_mainpage['buttons_xpath']
                     for button_xpath in buttons_xpath_to_press:
                         button = driver.find_element(
                             By.XPATH,
