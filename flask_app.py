@@ -74,7 +74,7 @@ source_list = {
         'url': 'https://mangareader.to/dragon-ball-super-color-edition-55928',
         'base_url': 'https://mangareader.to/read/dragon-ball-super-color-edition-55928/en/chapter',
         'has_color': True,
-        'reverse_order': True,
+        'reverse_order': False,
         'javascript_args_mainpage': {
             'dummy': [],
         },
