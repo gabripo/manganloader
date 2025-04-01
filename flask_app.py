@@ -21,37 +21,42 @@ source_list = {
         'base_url': None,
         'has_color': False,
         'reverse_order': True,
-        'javascript_args': {},
+        'javascript_args_mainpage': {},
+        'javascript_args_chapter': {},
         },
     'readonepiece': {
         'url': 'https://ww11.readonepiece.com/index.php/manga/one-piece-digital-colored-comics/',
         'base_url': 'https://ww11.readonepiece.com/index.php/chapter/',
         'has_color': True,
         'reverse_order': False,
-        'javascript_args': {},
+        'javascript_args_mainpage': {},
+        'javascript_args_chapter': {},
         },
     'dbsmanga_bw': {
         'url': 'https://ww9.dbsmanga.com/manga/dragon-ball-super/',
         'base_url': 'https://ww9.dbsmanga.com/chapter/',
         'has_color': False,
         'reverse_order': False,
-        'javascript_args': {},
+        'javascript_args_mainpage': {},
+        'javascript_args_chapter': {},
         },
     'dbsmanga_col': {
         'url': 'https://ww9.dbsmanga.com/manga/dragon-ball-super-colored/',
         'base_url': 'https://ww9.dbsmanga.com/chapter/',
         'has_color': True,
         'reverse_order': False,
-        'javascript_args': {},
+        'javascript_args_mainpage': {},
+        'javascript_args_chapter': {},
         },
     'weebcentral_dbs_col': {
         'url': 'https://weebcentral.com/series/01J76XYEWEQKT8DFAMV2S1Z883/Dragon-Ball-Super-Color',
         'base_url': 'https://weebcentral.com/chapters/',
         'has_color': True,
         'reverse_order': False,
-        'javascript_args': {
+        'javascript_args_mainpage': {
             'buttons': ['Show All Chapters'],
         },
+        'javascript_args_chapter': {},
         },
 }
 
@@ -94,7 +99,7 @@ def DownloadBackend(
     else:
         chapters_links = chapters_links[:num_chapters]
 
-    use_javascript = source_dict.get('javascript_args', {}) != {}
+    use_javascript = source_dict.get('javascript_args_mainpage', {}) != {}
     batch_download_chapters(
         chapters_links=chapters_links,
         use_color=source_colored,

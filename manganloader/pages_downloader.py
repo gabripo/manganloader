@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import StaleElementReferenceException
 from manganloader.mloader_wrapper import MloaderWrapper
@@ -30,7 +32,7 @@ class Mangapage:
             return
         self.url = url
 
-    def fetch_images(self, output_folder: str = None, use_javascript: bool = False):
+    def fetch_images(self, output_folder: str = None, javascript_args_chapter: dict = {}):
         if self.url is None:
             print("Invalid url, impossible to fetch images!")
             return
@@ -44,7 +46,7 @@ class Mangapage:
             self.images = mloader.download_chapters(chapter_number)
         else:
             # fallback to normal webpage scraping
-            if use_javascript:
+            if javascript_args_chapter != {}:
                 # webpage scraping with Javascript
                 try:
                     chrome_options = webdriver.ChromeOptions()
@@ -63,6 +65,16 @@ class Mangapage:
                     
                     driver.get(self.url)
                     time.sleep(SELENIUM_LOAD_TIME_S)
+
+                    if 'buttons' in javascript_args_chapter.keys():
+                        buttons_to_press = javascript_args_chapter['buttons']
+                        for button_name in buttons_to_press:
+                            button = driver.find_element(
+                                By.XPATH,
+                                f"//button[contains(text(), '{button_name}')]",
+                            )
+                            button.click()
+                            time.sleep(SELENIUM_LOAD_TIME_S)
 
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
                     seen = set()
@@ -220,6 +232,16 @@ class Mangapage:
                         button.click()
                         time.sleep(SELENIUM_LOAD_TIME_S)
                 
+                if 'buttons_xpath' in javascript_args.keys():
+                    buttons_xpath_to_press = javascript_args['buttons_xpath']
+                    for button_xpath in buttons_xpath_to_press:
+                        button = driver.find_element(
+                            By.XPATH,
+                            button_xpath,
+                        )
+                        button.click()
+                        time.sleep(SELENIUM_LOAD_TIME_S)
+                
                 links_selenium = driver.find_elements(By.TAG_NAME, 'a')
                 links = [l.get_attribute('href') for l in links_selenium]
             except Exception as exc:
@@ -236,6 +258,8 @@ class Mangapage:
         seen = set()
         chapters_links = []
         for link in links:
+            if link is None:
+                continue
             if base_url not in link:
                 continue
             if link not in seen:
