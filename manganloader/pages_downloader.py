@@ -68,30 +68,10 @@ class Mangapage:
                     driver.get(self.url)
                     time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
-                    if 'buttons' in javascript_args_chapter.keys():
-                        buttons_to_press = javascript_args_chapter['buttons']
-                        for button_name in buttons_to_press:
-                            button = driver.find_element(
-                                By.XPATH,
-                                f"//button[contains(text(), '{button_name}')]",
-                            )
-                            driver.execute_script("arguments[0].click();", button)
-                            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-
-                    if 'buttons_xpath' in javascript_args_chapter.keys():
-                        buttons_xpath_to_press = javascript_args_chapter['buttons_xpath']
-                        for button_xpath in buttons_xpath_to_press:
-                            button = driver.find_element(
-                                By.XPATH,
-                                button_xpath,
-                            )
-                            driver.execute_script("arguments[0].click();", button)
-                            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-
-                    if 'scrolls' in javascript_args_chapter.keys():
-                        num_scrolls = max(1, javascript_args_chapter['scrolls'])
-                        for _ in range(num_scrolls):
-                            Mangapage.scroll_down(driver=driver)
+                    Mangapage.javascript_actions(
+                        driver=driver,
+                        javascript_args=javascript_args_chapter,
+                        )
 
                     time.sleep(SELENIUM_LOAD_TIME_LONG_S)
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
@@ -241,25 +221,10 @@ class Mangapage:
                 driver.get(url)
                 time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
-                if 'buttons' in javascript_args_mainpage.keys():
-                    buttons_to_press = javascript_args_mainpage['buttons']
-                    for button_name in buttons_to_press:
-                        button = driver.find_element(
-                            By.XPATH,
-                            f"//button[contains(text(), '{button_name}')]",
-                        )
-                        driver.execute_script("arguments[0].click();", button)
-                        time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-                
-                if 'buttons_xpath' in javascript_args_mainpage.keys():
-                    buttons_xpath_to_press = javascript_args_mainpage['buttons_xpath']
-                    for button_xpath in buttons_xpath_to_press:
-                        button = driver.find_element(
-                            By.XPATH,
-                            button_xpath,
-                        )
-                        driver.execute_script("arguments[0].click();", button)
-                        time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
+                Mangapage.javascript_actions(
+                    driver=driver,
+                    javascript_args=javascript_args_mainpage,
+                )
                 
                 links_selenium = driver.find_elements(By.TAG_NAME, 'a')
                 links = [l.get_attribute('href') for l in links_selenium]
@@ -399,6 +364,33 @@ class Mangapage:
     def _is_mangaplus_url(url: str):
         pattern = r'https://mangaplus\.shueisha\.co\.jp/viewer'
         return bool(re.search(pattern, url))
+    
+    @classmethod
+    def javascript_actions(self, driver, javascript_args: dict = {}):
+        if 'buttons' in javascript_args.keys():
+            buttons_to_press = javascript_args['buttons']
+            for button_name in buttons_to_press:
+                button = driver.find_element(
+                    By.XPATH,
+                    f"//button[contains(text(), '{button_name}')]",
+                )
+                driver.execute_script("arguments[0].click();", button)
+                time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
+
+        if 'buttons_xpath' in javascript_args.keys():
+            buttons_xpath_to_press = javascript_args['buttons_xpath']
+            for button_xpath in buttons_xpath_to_press:
+                button = driver.find_element(
+                    By.XPATH,
+                    button_xpath,
+                )
+                driver.execute_script("arguments[0].click();", button)
+                time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
+
+        if 'scrolls' in javascript_args.keys():
+            num_scrolls = max(1, javascript_args['scrolls'])
+            for _ in range(num_scrolls):
+                Mangapage.scroll_down(driver=driver)
     
     @classmethod
     def scroll_down(self, driver):
