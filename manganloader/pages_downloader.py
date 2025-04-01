@@ -4,6 +4,7 @@ import urllib
 import asyncio, aiohttp, aiofiles
 import time
 import re
+import base64
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -75,29 +76,33 @@ class Mangapage:
 
                     for index, img_url in enumerate(images_urls):
                         if img_url:
-                            attempts = 0
-                            while attempts < 5:
-                                try:
-                                    # use javaScript to create a link and trigger a download
-                                    driver.execute_script(f"""
-                                        var link = document.createElement('a');
-                                        link.href = '{img_url}';
-                                        link.download = 'image_{index}.png';
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                    """)
-                                    if os.path.exists(os.path.join(output_folder, f'image_{index}.png')):
-                                        break
-                                    else:
-                                        attempts += 1
-                                except StaleElementReferenceException:
-                                    attempts += 1
-                                    continue
+                            driver.get(img_url)
+                            time.sleep(SELENIUM_LOAD_TIME_S)
 
+                            img_elements = driver.find_elements(By.TAG_NAME, "img")
+                            if img_elements:
+                                img_element = img_elements[0]
+                                img_width = driver.execute_script("return arguments[0].naturalWidth", img_element)
+                                img_height = driver.execute_script("return arguments[0].naturalHeight", img_element)
+
+                                img_data = driver.execute_script(f"""
+                                var canvas = document.createElement('canvas');
+                                var context = canvas.getContext('2d');
+                                var img = arguments[0];
+                                canvas.width = {img_width};
+                                canvas.height = {img_height};
+                                context.drawImage(img, 0, 0);
+                                return canvas.toDataURL('image/png').substring(22);
+                                """, img_element)
+
+                                img_path = os.path.join(output_folder, f"image_{index}.png")
+                                with open(img_path, 'wb') as img_file:
+                                    img_file.write(base64.b64decode(img_data))
+                            else:
+                                print(f"No images were found at the url {img_url} ! Maybe a cloud protection was active?")
                 except Exception as exc:
                     print(f"Impossible to fetch images from the url {self.url} : {exc}")
-                    images_urls = []
+                    self.images = []
                 finally:
                     driver.quit()
             else:
