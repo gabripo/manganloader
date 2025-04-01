@@ -483,6 +483,8 @@ def batch_download_chapters(
         gen_double_spread: bool = False,
         javascript_args_chapter: dict = {},
         ):
+    if type(chapters_links) == str:
+        chapters_links = [chapters_links]
     for id, link in enumerate(chapters_links):
         chapter_name = prefix + "{:05}".format(len(chapters_links)-id)
         d = Document(
