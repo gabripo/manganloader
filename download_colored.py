@@ -9,13 +9,13 @@ USE_JAVASCRIPT = True
 
 if __name__ == "__main__":
     if USE_JAVASCRIPT:
-        url = 'https://mangatoto.net/title/86383'
-        base_url = 'https://mangatoto.net/title/86383-dragon-ball-super-digital-colored-official-tl-overlaid/'
+        url = 'https://mangareader.to/dragon-ball-super-color-edition-55928'
+        base_url = 'https://mangareader.to/read/dragon-ball-super-color-edition-55928/en/chapter'
         javascript_args_mainpage = {
-            'buttons_xpath': ['/html/body/div/main/div[3]/astro-island/div/div[1]/div[1]/span'],
+            'dummy': [],
         }
         javascript_args_chapter = {
-            'buttons': ['load all pages'],
+            'buttons_xpath': ["/html/body/div[1]/div[4]/div/div[1]/div/div[3]/a[1]"],
         }
     else:
         # url = 'https://ww9.dbsmanga.com/manga/dragon-ball-super/'
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     chapters_links = Mangapage.fetch_latest_chapters_generic(
         url=url,
         base_url=base_url,
-        javascript_args=javascript_args_mainpage,
+        javascript_args_mainpage=javascript_args_mainpage,
     )
     # chapters_links = chapters_links[-100:] # take it easy, man!
 
