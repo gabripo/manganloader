@@ -62,7 +62,7 @@ source_list = {
         'url': 'https://mangatoto.net/title/86383',
         'base_url': 'https://mangatoto.net/title/86383-dragon-ball-super-digital-colored-official-tl-overlaid/',
         'has_color': True,
-        'reverse_order': False,
+        'reverse_order': True,
         'javascript_args_mainpage': {
             'buttons_xpath': ['/html/body/div/main/div[3]/astro-island/div/div[1]/div[1]/span'],
         },
