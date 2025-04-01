@@ -18,7 +18,8 @@ from manganloader.mloader_wrapper import MloaderWrapper
 VALID_RESPONSE_STATUS = 200
 MAX_RETRIES = 5
 MANGAPLUS_OP_URL = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
-SELENIUM_LOAD_TIME_S = 1
+SELENIUM_LOAD_TIME_SHORT_S = 1
+SELENIUM_LOAD_TIME_LONG_S = 5
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -65,7 +66,7 @@ class Mangapage:
                         )
                     
                     driver.get(self.url)
-                    time.sleep(SELENIUM_LOAD_TIME_S)
+                    time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
                     if 'buttons' in javascript_args_chapter.keys():
                         buttons_to_press = javascript_args_chapter['buttons']
@@ -75,7 +76,7 @@ class Mangapage:
                                 f"//button[contains(text(), '{button_name}')]",
                             )
                             driver.execute_script("arguments[0].click();", button)
-                            time.sleep(SELENIUM_LOAD_TIME_S)
+                            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
                     if 'buttons_xpath' in javascript_args_chapter.keys():
                         buttons_xpath_to_press = javascript_args_chapter['buttons_xpath']
@@ -85,13 +86,14 @@ class Mangapage:
                                 button_xpath,
                             )
                             driver.execute_script("arguments[0].click();", button)
-                            time.sleep(SELENIUM_LOAD_TIME_S)
+                            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
                     if 'scrolls' in javascript_args_chapter.keys():
                         num_scrolls = max(1, javascript_args_chapter['scrolls'])
                         for _ in range(num_scrolls):
                             Mangapage.scroll_down(driver=driver)
 
+                    time.sleep(SELENIUM_LOAD_TIME_LONG_S)
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
                     seen = set()
                     images_urls = []
@@ -105,7 +107,7 @@ class Mangapage:
                     for index, img_url in enumerate(images_urls):
                         if img_url:
                             driver.get(img_url)
-                            time.sleep(SELENIUM_LOAD_TIME_S)
+                            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
                             img_elements = driver.find_elements(By.TAG_NAME, "img")
                             if img_elements:
@@ -237,7 +239,7 @@ class Mangapage:
                     service=ChromeService(ChromeDriverManager().install()),
                 )
                 driver.get(url)
-                time.sleep(SELENIUM_LOAD_TIME_S)
+                time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
                 if 'buttons' in javascript_args_mainpage.keys():
                     buttons_to_press = javascript_args_mainpage['buttons']
@@ -247,7 +249,7 @@ class Mangapage:
                             f"//button[contains(text(), '{button_name}')]",
                         )
                         driver.execute_script("arguments[0].click();", button)
-                        time.sleep(SELENIUM_LOAD_TIME_S)
+                        time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
                 
                 if 'buttons_xpath' in javascript_args_mainpage.keys():
                     buttons_xpath_to_press = javascript_args_mainpage['buttons_xpath']
@@ -257,7 +259,7 @@ class Mangapage:
                             button_xpath,
                         )
                         driver.execute_script("arguments[0].click();", button)
-                        time.sleep(SELENIUM_LOAD_TIME_S)
+                        time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
                 
                 links_selenium = driver.find_elements(By.TAG_NAME, 'a')
                 links = [l.get_attribute('href') for l in links_selenium]
@@ -404,7 +406,7 @@ class Mangapage:
         while True:
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             
-            time.sleep(SELENIUM_LOAD_TIME_S)
+            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
             new_height = driver.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
