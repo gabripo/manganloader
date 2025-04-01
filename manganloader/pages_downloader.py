@@ -48,6 +48,7 @@ class Mangapage:
             # fallback to normal webpage scraping
             if javascript_args_chapter != {}:
                 # webpage scraping with Javascript
+                self.images = []
                 try:
                     chrome_options = webdriver.ChromeOptions()
                     chrome_options.add_experimental_option("prefs", {
@@ -110,11 +111,12 @@ class Mangapage:
                                 img_path = os.path.join(output_folder, f"image_{index}.png")
                                 with open(img_path, 'wb') as img_file:
                                     img_file.write(base64.b64decode(img_data))
+                                print(f"Image {img_path} generated from url {img_url}")
+                                self.images.append(img_path)
                             else:
                                 print(f"No images were found at the url {img_url} ! Maybe a cloud protection was active?")
                 except Exception as exc:
                     print(f"Impossible to fetch images from the url {self.url} : {exc}")
-                    self.images = []
                 finally:
                     driver.quit()
             else:
