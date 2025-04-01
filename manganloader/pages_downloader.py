@@ -74,7 +74,17 @@ class Mangapage:
                                 By.XPATH,
                                 f"//button[contains(text(), '{button_name}')]",
                             )
-                            button.click()
+                            driver.execute_script("arguments[0].click();", button)
+                            time.sleep(SELENIUM_LOAD_TIME_S)
+
+                    if 'buttons_xpath' in javascript_args_chapter.keys():
+                        buttons_xpath_to_press = javascript_args_chapter['buttons_xpath']
+                        for button_xpath in buttons_xpath_to_press:
+                            button = driver.find_element(
+                                By.XPATH,
+                                button_xpath,
+                            )
+                            driver.execute_script("arguments[0].click();", button)
                             time.sleep(SELENIUM_LOAD_TIME_S)
 
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
@@ -231,7 +241,7 @@ class Mangapage:
                             By.XPATH,
                             f"//button[contains(text(), '{button_name}')]",
                         )
-                        button.click()
+                        driver.execute_script("arguments[0].click();", button)
                         time.sleep(SELENIUM_LOAD_TIME_S)
                 
                 if 'buttons_xpath' in javascript_args_mainpage.keys():
@@ -241,7 +251,7 @@ class Mangapage:
                             By.XPATH,
                             button_xpath,
                         )
-                        button.click()
+                        driver.execute_script("arguments[0].click();", button)
                         time.sleep(SELENIUM_LOAD_TIME_S)
                 
                 links_selenium = driver.find_elements(By.TAG_NAME, 'a')
