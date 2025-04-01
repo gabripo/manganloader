@@ -91,23 +91,12 @@ class Mangapage:
 
                             img_elements = driver.find_elements(By.TAG_NAME, "img")
                             if img_elements:
-                                img_element = img_elements[0]
-                                img_width = driver.execute_script("return arguments[0].naturalWidth", img_element)
-                                img_height = driver.execute_script("return arguments[0].naturalHeight", img_element)
-
-                                img_data = driver.execute_script(f"""
-                                var canvas = document.createElement('canvas');
-                                var context = canvas.getContext('2d');
-                                var img = arguments[0];
-                                canvas.width = {img_width};
-                                canvas.height = {img_height};
-                                context.drawImage(img, 0, 0);
-                                return canvas.toDataURL('image/png').substring(22);
-                                """, img_element)
-
-                                img_path = os.path.join(output_folder, f"image_{index}.png")
-                                with open(img_path, 'wb') as img_file:
-                                    img_file.write(base64.b64decode(img_data))
+                                img_path = Mangapage.save_image_element_with_driver(
+                                    driver=driver,
+                                    img_element=img_elements[0],
+                                    output_folder=output_folder,
+                                    filename=f"image_{index}.png",
+                                )
                                 print(f"Image {img_path} generated from url {img_url}")
                                 self.images.append(img_path)
                             else:
@@ -406,3 +395,29 @@ class Mangapage:
             last_height = new_height
 
         driver.execute_script("window.scrollTo(0, 0);") # scroll back when finished
+
+    @classmethod
+    def save_image_element_with_driver(
+        self,
+        driver,
+        img_element,
+        output_folder: str,
+        filename: str,
+        ) -> str:
+        img_width = driver.execute_script("return arguments[0].naturalWidth", img_element)
+        img_height = driver.execute_script("return arguments[0].naturalHeight", img_element)
+
+        img_data = driver.execute_script(f"""
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        var img = arguments[0];
+        canvas.width = {img_width};
+        canvas.height = {img_height};
+        context.drawImage(img, 0, 0);
+        return canvas.toDataURL('image/png').substring(22);
+        """, img_element)
+
+        img_path = os.path.join(output_folder, filename)
+        with open(img_path, 'wb') as img_file:
+            img_file.write(base64.b64decode(img_data))
+        return img_path
