@@ -64,7 +64,14 @@ class Mangapage:
                     time.sleep(SELENIUM_LOAD_TIME_S)
 
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
-                    images_urls = [l.get_attribute('src') for l in images_selenium]
+                    seen = set()
+                    images_urls = []
+                    for img_selenium in images_selenium:
+                        img_url = img_selenium.get_attribute('src')
+                        if img_url in seen:
+                            continue
+                        images_urls.append(img_url)
+                        seen.add(img_url)
 
                     for index, img_url in enumerate(images_urls):
                         if img_url:
