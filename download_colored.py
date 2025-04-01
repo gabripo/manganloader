@@ -16,6 +16,7 @@ if __name__ == "__main__":
         }
         javascript_args_chapter = {
             'buttons_xpath': ["/html/body/div[1]/div[4]/div/div[1]/div/div[3]/a[1]"],
+            'scrolls': 3,
         }
     else:
         # url = 'https://ww9.dbsmanga.com/manga/dragon-ball-super/'

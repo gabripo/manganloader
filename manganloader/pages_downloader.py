@@ -87,6 +87,11 @@ class Mangapage:
                             driver.execute_script("arguments[0].click();", button)
                             time.sleep(SELENIUM_LOAD_TIME_S)
 
+                    if 'scrolls' in javascript_args_chapter.keys():
+                        num_scrolls = max(1, javascript_args_chapter['scrolls'])
+                        for _ in range(num_scrolls):
+                            Mangapage.scroll_down(driver=driver)
+
                     images_selenium = driver.find_elements(By.TAG_NAME, 'img')
                     seen = set()
                     images_urls = []
@@ -392,3 +397,18 @@ class Mangapage:
     def _is_mangaplus_url(url: str):
         pattern = r'https://mangaplus\.shueisha\.co\.jp/viewer'
         return bool(re.search(pattern, url))
+    
+    @classmethod
+    def scroll_down(self, driver):
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        while True:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            
+            time.sleep(SELENIUM_LOAD_TIME_S)
+
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+
+        driver.execute_script("window.scrollTo(0, 0);") # scroll back when finished
