@@ -70,6 +70,19 @@ source_list = {
             'buttons': ['load all pages'],
         },
         },
+    'mangareader_dbs_col': {
+        'url': 'https://mangareader.to/dragon-ball-super-color-edition-55928',
+        'base_url': 'https://mangareader.to/read/dragon-ball-super-color-edition-55928/en/chapter',
+        'has_color': True,
+        'reverse_order': True,
+        'javascript_args_mainpage': {
+            'dummy': [],
+        },
+        'javascript_args_chapter': {
+            'buttons_xpath': ["/html/body/div[1]/div[4]/div/div[1]/div/div[3]/a[1]"],
+            'scrolls': 3,
+        },
+        },
 }
 
 @app.route('/')
