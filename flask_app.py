@@ -79,7 +79,12 @@ source_list = {
             'dummy': [],
         },
         'javascript_args_chapter': {
-            'buttons_xpath': ["/html/body/div[1]/div[4]/div/div[1]/div/div[3]/a[1]"],
+            'buttons_xpath': [
+                "/html/body/div[1]/div[4]/div/div[1]/div/div[3]/a[1]", # Vertical Follow
+                "/html/body/div[1]/div[1]/div/div[1]/div[3]/div[2]", # Settings
+                "/html/body/div[1]/div[3]/div/div/div[1]/div[3]/button", # Quality
+                "/html/body/div[1]/div[3]/div/div/div[1]/div[3]/div/a[1]", # High
+            ],
             'scrolls': 3,
         },
         },
