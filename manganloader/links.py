@@ -71,4 +71,14 @@ source_list = {
             'scrolls': 3,
         },
         },
+    'mangaberri_dbs_col': {
+        'url': 'https://mangaberri.com/dbs-colored-manga',
+        'base_url': 'https://mangaberri.com/dbs-colored-manga/',
+        'has_color': True,
+        'reverse_order': False,
+        'javascript_args_mainpage': {
+            "dummy": [],
+        },
+        'javascript_args_chapter': {},
+        },
 }

@@ -9,20 +9,12 @@ USE_JAVASCRIPT = True
 
 if __name__ == "__main__":
     if USE_JAVASCRIPT:
-        url = 'https://mangareader.to/dragon-ball-super-color-edition-55928'
-        base_url = 'https://mangareader.to/read/dragon-ball-super-color-edition-55928/en/chapter'
+        url = 'https://mangaberri.com/dbs-colored-manga'
+        base_url = 'https://mangaberri.com/dbs-colored-manga/'
         javascript_args_mainpage = {
             'dummy': [],
         }
-        javascript_args_chapter = {
-            'buttons_xpath': [
-                "/html/body/div[1]/div[4]/div/div[1]/div/div[3]/a[1]", # Vertical Follow
-                "/html/body/div[1]/div[1]/div/div[1]/div[3]/div[2]", # Settings
-                "/html/body/div[1]/div[3]/div/div/div[1]/div[3]/button", # Quality
-                "/html/body/div[1]/div[3]/div/div/div[1]/div[3]/div/a[1]", # High
-                ],
-            'scrolls': 3,
-        }
+        javascript_args_chapter = {}
     else:
         # url = 'https://ww9.dbsmanga.com/manga/dragon-ball-super/'
         url = 'https://ww9.dbsmanga.com/manga/dragon-ball-super-colored/'
