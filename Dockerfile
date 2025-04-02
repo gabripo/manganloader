@@ -20,6 +20,8 @@ ENV TargetPort=3000
 EXPOSE ${TargetPort}/udp
 EXPOSE ${TargetPort}/tcp
 
+ENV APP_IN_DOCKER=Yes
+
 ENTRYPOINT [ "python" ]
 CMD ["flask_app.py"]
 # ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:${TargetPort}", "flask_app:app"]

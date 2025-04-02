@@ -6,20 +6,12 @@ import time
 import re
 import base64
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.common.exceptions import StaleElementReferenceException
+from manganloader.selenium_manager import SeleniumManager, SELENIUM_LOAD_TIME_SHORT_S, SELENIUM_LOAD_TIME_LONG_S
 from manganloader.mloader_wrapper import MloaderWrapper
 
 VALID_RESPONSE_STATUS = 200
 MAX_RETRIES = 5
 MANGAPLUS_OP_URL = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
-SELENIUM_LOAD_TIME_SHORT_S = 1
-SELENIUM_LOAD_TIME_LONG_S = 5
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -51,30 +43,33 @@ class Mangapage:
                 # webpage scraping with Javascript
                 self.images = []
                 try:
-                    chrome_options = webdriver.ChromeOptions()
-                    chrome_options.add_experimental_option("prefs", {
-                        "download.default_directory": output_folder,
-                        "download.prompt_for_download": False,
-                        "download.directory_upgrade": True,
-                        "safebrowsing.enabled": True,
-                        "profile.default_content_setting_values.automatic_downloads": 1,
-                        "profile.default_content_setting_values.popups": 0,
-                    })
-                    driver = webdriver.Chrome(
-                            service=ChromeService(ChromeDriverManager().install()),
-                            options=chrome_options,
-                        )
+                    selenium_manager = SeleniumManager(driver_type="chrome")
+                    if os.getenv("APP_IN_DOCKER") == "Yes":
+                        print("DOCKER EXECUTION DETECTED")
+                        selenium_manager.generate_driver_options({
+                            'download_directory': output_folder,
+                            'unlimited_downloads': True,
+                            'headless_mode': True,
+                            'docker_support': True,
+                        })
+                    else:
+                        selenium_manager.generate_driver_options({
+                            'download_directory': output_folder,
+                            'unlimited_downloads': True,
+                        })
+                    selenium_manager.create_driver()
+                    driver = selenium_manager.get_driver()
                     
                     driver.get(self.url)
                     time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
-                    Mangapage.javascript_actions(
+                    SeleniumManager.javascript_actions(
                         driver=driver,
                         javascript_args=javascript_args_chapter,
                         )
 
                     time.sleep(SELENIUM_LOAD_TIME_LONG_S)
-                    images_selenium = driver.find_elements(By.TAG_NAME, 'img')
+                    images_selenium = selenium_manager.find_images()
                     seen = set()
                     images_urls = []
                     for img_selenium in images_selenium:
@@ -89,9 +84,9 @@ class Mangapage:
                             driver.get(img_url)
                             time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
-                            img_elements = driver.find_elements(By.TAG_NAME, "img")
+                            img_elements = selenium_manager.find_images()
                             if img_elements:
-                                img_path = Mangapage.save_image_element_with_driver(
+                                img_path = SeleniumManager.save_image_element_with_driver(
                                     driver=driver,
                                     img_element=img_elements[0],
                                     output_folder=output_folder,
@@ -204,18 +199,25 @@ class Mangapage:
         if javascript_args_mainpage:
             # rendering with Javascript
             try:
-                driver = webdriver.Chrome(
-                    service=ChromeService(ChromeDriverManager().install()),
-                )
+                selenium_manager = SeleniumManager(driver_type="chrome")
+                if os.getenv("APP_IN_DOCKER") == "Yes":
+                    print("DOCKER EXECUTION DETECTED")
+                    selenium_manager.generate_driver_options({
+                        'headless_mode': True,
+                        'docker_support': True,
+                    })
+                selenium_manager.create_driver()
+                driver = selenium_manager.get_driver()
+
                 driver.get(url)
                 time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
 
-                Mangapage.javascript_actions(
+                SeleniumManager.javascript_actions(
                     driver=driver,
                     javascript_args=javascript_args_mainpage,
                 )
                 
-                links_selenium = driver.find_elements(By.TAG_NAME, 'a')
+                links_selenium = selenium_manager.find_links()
                 links = [l.get_attribute('href') for l in links_selenium]
             except Exception as exc:
                 print(f"Impossible to fetch links from the url {url} : {exc}")
@@ -353,71 +355,3 @@ class Mangapage:
     def _is_mangaplus_url(url: str):
         pattern = r'https://mangaplus\.shueisha\.co\.jp/viewer'
         return bool(re.search(pattern, url))
-    
-    @classmethod
-    def javascript_actions(self, driver, javascript_args: dict = {}):
-        if 'buttons' in javascript_args.keys():
-            buttons_to_press = javascript_args['buttons']
-            for button_name in buttons_to_press:
-                button = driver.find_element(
-                    By.XPATH,
-                    f"//button[contains(text(), '{button_name}')]",
-                )
-                driver.execute_script("arguments[0].click();", button)
-                time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-
-        if 'buttons_xpath' in javascript_args.keys():
-            buttons_xpath_to_press = javascript_args['buttons_xpath']
-            for button_xpath in buttons_xpath_to_press:
-                button = driver.find_element(
-                    By.XPATH,
-                    button_xpath,
-                )
-                driver.execute_script("arguments[0].click();", button)
-                time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-
-        if 'scrolls' in javascript_args.keys():
-            num_scrolls = max(1, javascript_args['scrolls'])
-            for _ in range(num_scrolls):
-                Mangapage.scroll_down(driver=driver)
-    
-    @classmethod
-    def scroll_down(self, driver):
-        last_height = driver.execute_script("return document.body.scrollHeight")
-        while True:
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            
-            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-
-            new_height = driver.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                break
-            last_height = new_height
-
-        driver.execute_script("window.scrollTo(0, 0);") # scroll back when finished
-
-    @classmethod
-    def save_image_element_with_driver(
-        self,
-        driver,
-        img_element,
-        output_folder: str,
-        filename: str,
-        ) -> str:
-        img_width = driver.execute_script("return arguments[0].naturalWidth", img_element)
-        img_height = driver.execute_script("return arguments[0].naturalHeight", img_element)
-
-        img_data = driver.execute_script(f"""
-        var canvas = document.createElement('canvas');
-        var context = canvas.getContext('2d');
-        var img = arguments[0];
-        canvas.width = {img_width};
-        canvas.height = {img_height};
-        context.drawImage(img, 0, 0);
-        return canvas.toDataURL('image/png').substring(22);
-        """, img_element)
-
-        img_path = os.path.join(output_folder, filename)
-        with open(img_path, 'wb') as img_file:
-            img_file.write(base64.b64decode(img_data))
-        return img_path
