@@ -190,7 +190,7 @@ class SeleniumManager():
                 img_url = img_element.get_attribute('src')
                 print(f"Empty data for image at url {img_url} : maybe a loading error?")
         except Exception as exc:
-            print(f"Error while executing Javascript with input image {img_element.get_attribute('src')}")
+            print(f"Error while executing Javascript with input image {img_element.get_attribute('src')} : {exc}")
     
     @classmethod
     def javascript_actions(self, driver, javascript_args: dict = {}):
