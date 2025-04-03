@@ -88,7 +88,7 @@ class Mangapage:
                                 driver=driver,
                                 img_element=img_element,
                                 output_folder=output_folder,
-                                filename=f"image_{index}.png",
+                                filename=f"image_{index:05}.png",
                             )
                             if img_path:
                                 print(f"Image {img_path} generated from url {img_url}")
