@@ -182,9 +182,13 @@ class SeleniumManager():
             """, img_element)
 
             img_path = os.path.join(output_folder, filename)
-            with open(img_path, 'wb') as img_file:
-                img_file.write(base64.b64decode(img_data))
-            return img_path
+            if img_data:
+                with open(img_path, 'wb') as img_file:
+                    img_file.write(base64.b64decode(img_data))
+                return img_path
+            else:
+                img_url = img_element.get_attribute('src')
+                print(f"Empty data for image at url {img_url} : maybe a loading error?")
         except Exception as exc:
             print(f"Error while executing Javascript with input image {img_element.get_attribute('src')}")
     

@@ -90,8 +90,9 @@ class Mangapage:
                                 output_folder=output_folder,
                                 filename=f"image_{index}.png",
                             )
-                            print(f"Image {img_path} generated from url {img_url}")
-                            self.images.append(img_path)
+                            if img_path:
+                                print(f"Image {img_path} generated from url {img_url}")
+                                self.images.append(img_path)
                         else:
                             print(f"No images were found at the url {img_url} ! Maybe a cloud protection was active?")
                 except Exception as exc:
