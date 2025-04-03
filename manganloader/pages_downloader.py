@@ -70,32 +70,28 @@ class Mangapage:
 
                     time.sleep(SELENIUM_LOAD_TIME_LONG_S)
                     images_selenium = selenium_manager.find_images()
-                    seen = set()
-                    images_urls = []
+                    images_urls = set()
+                    images_selenium_unique = []
                     for img_selenium in images_selenium:
                         img_url = img_selenium.get_attribute('src')
-                        if img_url in seen:
+                        if img_url in images_urls:
                             continue
-                        images_urls.append(img_url)
-                        seen.add(img_url)
+                        images_selenium_unique.append(img_selenium)
+                        images_urls.add(img_url)
 
-                    for index, img_url in enumerate(images_urls):
+                    for index, img_element in enumerate(images_selenium_unique):
+                        img_url = img_selenium.get_attribute('src')
                         if img_url:
-                            driver.get(img_url)
-                            time.sleep(SELENIUM_LOAD_TIME_SHORT_S)
-
-                            img_elements = selenium_manager.find_images()
-                            if img_elements:
-                                img_path = SeleniumManager.save_image_element_with_driver(
-                                    driver=driver,
-                                    img_element=img_elements[0],
-                                    output_folder=output_folder,
-                                    filename=f"image_{index}.png",
-                                )
-                                print(f"Image {img_path} generated from url {img_url}")
-                                self.images.append(img_path)
-                            else:
-                                print(f"No images were found at the url {img_url} ! Maybe a cloud protection was active?")
+                            img_path = SeleniumManager.save_image_element_with_driver(
+                                driver=driver,
+                                img_element=img_element,
+                                output_folder=output_folder,
+                                filename=f"image_{index}.png",
+                            )
+                            print(f"Image {img_path} generated from url {img_url}")
+                            self.images.append(img_path)
+                        else:
+                            print(f"No images were found at the url {img_url} ! Maybe a cloud protection was active?")
                 except Exception as exc:
                     print(f"Impossible to fetch images from the url {self.url} : {exc}")
                 finally:
