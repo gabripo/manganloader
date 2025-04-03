@@ -60,6 +60,9 @@ class SeleniumManager():
                 self.driver_options.add_argument("--no-sandbox")
                 self.driver_options.add_argument("--disable-dev-shm-usage")
 
+            if options_dict.get('disable_cors', False):
+                self.driver_options.add_argument("--disable-web-security")
+
     def clear_driver_options(self):
         self.driver_options = None
         
@@ -164,23 +167,26 @@ class SeleniumManager():
         output_folder: str,
         filename: str,
         ) -> str:        
-        img_width = driver.execute_script("return arguments[0].naturalWidth", img_element)
-        img_height = driver.execute_script("return arguments[0].naturalHeight", img_element)
+        try:
+            img_width = driver.execute_script("return arguments[0].naturalWidth", img_element)
+            img_height = driver.execute_script("return arguments[0].naturalHeight", img_element)
 
-        img_data = driver.execute_script(f"""
-        var canvas = document.createElement('canvas');
-        var context = canvas.getContext('2d');
-        var img = arguments[0];
-        canvas.width = {img_width};
-        canvas.height = {img_height};
-        context.drawImage(img, 0, 0);
-        return canvas.toDataURL('image/png').substring(22);
-        """, img_element)
+            img_data = driver.execute_script(f"""
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            var img = arguments[0];
+            canvas.width = {img_width};
+            canvas.height = {img_height};
+            context.drawImage(img, 0, 0);
+            return canvas.toDataURL('image/png').substring(22);
+            """, img_element)
 
-        img_path = os.path.join(output_folder, filename)
-        with open(img_path, 'wb') as img_file:
-            img_file.write(base64.b64decode(img_data))
-        return img_path
+            img_path = os.path.join(output_folder, filename)
+            with open(img_path, 'wb') as img_file:
+                img_file.write(base64.b64decode(img_data))
+            return img_path
+        except Exception as exc:
+            print(f"Error while executing Javascript with input image {img_element.get_attribute('src')}")
     
     @classmethod
     def javascript_actions(self, driver, javascript_args: dict = {}):

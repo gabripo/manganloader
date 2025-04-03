@@ -49,6 +49,7 @@ class Mangapage:
                         selenium_manager.generate_driver_options({
                             'download_directory': output_folder,
                             'unlimited_downloads': True,
+                            'disable_cors': True,
                             'headless_mode': True,
                             'docker_support': True,
                         })
@@ -56,6 +57,7 @@ class Mangapage:
                         selenium_manager.generate_driver_options({
                             'download_directory': output_folder,
                             'unlimited_downloads': True,
+                            'disable_cors': True,
                         })
                     selenium_manager.create_driver()
                     driver = selenium_manager.get_driver()
