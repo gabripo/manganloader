@@ -39,7 +39,9 @@ source_list = {
         'javascript_args_mainpage': {
             'buttons': ['Show All Chapters'],
         },
-        'javascript_args_chapter': {},
+        'javascript_args_chapter': {
+            'dummy': [],
+        },
         },
     'mangatoto_dbs_col': {
         'url': 'https://mangatoto.net/title/86383',
