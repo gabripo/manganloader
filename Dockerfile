@@ -9,12 +9,11 @@ RUN apt-get -y install google-chrome-stable
 ENV DockerHOME=/home/manganloader
 RUN mkdir -p ${DockerHOME}
 WORKDIR ${DockerHOME}
-COPY . $DockerHOME
+RUN git clone --recurse-submodules https://github.com/gabripo/manganloader.git ${DockerHOME}
 
 RUN pip install -r requirements.txt
 RUN git submodule update --init --recursive
-
-RUN pip install gunicorn
+# RUN pip install gunicorn
 
 ENV TargetPort=3000
 EXPOSE ${TargetPort}/udp
