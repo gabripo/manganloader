@@ -21,6 +21,12 @@ EXPOSE ${TargetPort}/tcp
 
 ENV APP_IN_DOCKER=Yes
 
+# ensure Python prints are catched when created - and not buffered
+ENV PYTHONUNBUFFERED=TRUE
+
+# entrypoint with Flask only - no gunicorn
 # ENTRYPOINT [ "python" ]
 # CMD ["flask_app.py"]
+
+# entrypoint with gunicorn
 ENTRYPOINT gunicorn --bind 0.0.0.0:${TargetPort} flask_app:app
