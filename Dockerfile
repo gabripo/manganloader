@@ -13,7 +13,7 @@ RUN git clone --recurse-submodules https://github.com/gabripo/manganloader.git $
 
 RUN pip install -r requirements.txt
 RUN git submodule update --init --recursive
-# RUN pip install gunicorn
+RUN pip install gunicorn
 
 ENV TargetPort=3000
 EXPOSE ${TargetPort}/udp
@@ -21,6 +21,6 @@ EXPOSE ${TargetPort}/tcp
 
 ENV APP_IN_DOCKER=Yes
 
-ENTRYPOINT [ "python" ]
-CMD ["flask_app.py"]
-# ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:${TargetPort}", "flask_app:app"]
+# ENTRYPOINT [ "python" ]
+# CMD ["flask_app.py"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:${TargetPort}", "flask_app:app"]
