@@ -23,4 +23,4 @@ ENV APP_IN_DOCKER=Yes
 
 # ENTRYPOINT [ "python" ]
 # CMD ["flask_app.py"]
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:${TargetPort}", "flask_app:app"]
+ENTRYPOINT gunicorn --bind 0.0.0.0:${TargetPort} flask_app:app
