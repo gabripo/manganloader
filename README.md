@@ -17,6 +17,7 @@ The version does not rely on Selenium and Javascript to download mangas, hence i
 If you dare downloading mangas from these exotic sources, you will get an empty zip file - and you deserve it, I told you to not try!
 
 ## Docker Container
+### Spin-up your whale
 Everybody likes [Docker](https://www.docker.com/) 🐳.
 I do, as well, then I provided a script to build an image 📦:
 ```bash
@@ -29,6 +30,12 @@ chmod +x docker_run.sh
 sh docker_run.sh
 ```
 The Dockerfile fetches the latest version of the repo, prepares the environment for deployment, serves the app through [Gunicorn](https://gunicorn.org/).
+### Usage
+The application is usually served on [http://0.0.0.0:3000](http://0.0.0.0:3000) .
+Just to be sure, check the Docker logs and you will see a nice sentence like:
+```
+Link to the project homepage: http://0.0.0.0:3000
+```
 
 ## Local Installation
 ### Python dependencies
@@ -44,6 +51,15 @@ Use git to download the [KCC](https://github.com/ciromattia/kcc/tree/master) sou
 git submodule update --init --recursive
 ```
 KCC will be stored into the `kcc` folder - and invoked from there.
+### Usage
+If you just want your manga, run the [Flask](https://flask.palletsprojects.com) application witht the command:
+```bash
+python3 flask_app.py
+```
+It is OS-agnostic, then you have no excuses for missing dependencies on your Windows machine.
+
+If you are nerd, you can find examples of calls in the `test.py` and `download_colored.py`files.
+It can be useful for people writing Telegram bots - we both now to whom this message should be delivered, right @ShadowTemplate ?
 
 ## In the next episodes... (a.k.a. "ToDo List")
 - (front-end) Device selection if EPUB selected, we have KCC then we are powerful enough to generate device-specific files.
