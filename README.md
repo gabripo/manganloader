@@ -52,13 +52,13 @@ git submodule update --init --recursive
 ```
 KCC will be stored into the `kcc` folder - and invoked from there.
 ### Usage
-If you just want your manga, run the [Flask](https://flask.palletsprojects.com) application witht the command:
+If you just want your manga, run the [Flask](https://flask.palletsprojects.com) application with the command:
 ```bash
 python3 flask_app.py
 ```
 It is OS-agnostic, then you have no excuses for missing dependencies on your Windows machine.
 
-If you are nerd, you can find examples of calls in the `test.py` and `download_colored.py`files.
+If you are nerd, you can find examples of calls in the `test.py` and `download_colored.py` files.
 It can be useful for people writing Telegram bots - we both now to whom this message should be delivered, right @ShadowTemplate ?
 
 ## In the next episodes... (a.k.a. "ToDo List")
