@@ -6,15 +6,16 @@
 - PDF generation through Pillow (yeah, easy there)
 
 ### Deployed version
-The application has been deployed onto Render:
-[https://manganloader.onrender.com/](https://manganloader.onrender.com/)
-Since I am poor, the website sometimes does not load as stuck - Render has a timeout for poor users - then wait few minutes until it spins up again.
-Ah, there are some memory constraints in the host machine on Render, then the application sometimes does not generate the files (if they are too big). Workaround: try again. I told you.
-
-A lighter version has been deployed, as well:
-[https://manganloader-simple.onrender.com/](https://manganloader-simple.onrender.com/)
-The version does not rely on Selenium and Javascript to download mangas, hence its usage is restricted to those sources which do not require these tricks.
+The application has been deployed onto:
+- Google Cloud [https://manganloader-bjo3n53nda-uc.a.run.app/](https://manganloader-bjo3n53nda-uc.a.run.app/)
+- Render [https://manganloader.onrender.com/](https://manganloader.onrender.com/)
+- Render - light version [https://manganloader-simple.onrender.com/](https://manganloader-simple.onrender.com/) . The version does not rely on Selenium and Javascript to download mangas, hence its usage is restricted to those sources which do not require these tricks.
 If you dare downloading mangas from these exotic sources, you will get an empty zip file - and you deserve it, I told you to not try!
+
+Since I am poor and I cannot afford unlimited cloud resources, the websites may not generate documents due to memory issues.
+
+Render has a timeout for poor users - then wait few minutes until it spins up again.
+Workaround: try again.
 
 ## Docker Container
 ### Spin-up your whale
