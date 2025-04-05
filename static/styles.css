@@ -52,6 +52,22 @@ button:hover {
     background-color: #0056b3;
 }
 
+.button-green {
+    background-color: #28a745;
+}
+
+.button-green:hover {
+    background-color: #218838;
+}
+
+.button-red {
+    background-color: #dc3545;
+}
+
+.button-red:hover {
+    background-color: #c82333;
+}
+
 #second-dropdown-container {
     margin-top: 10px;
 }

@@ -18,8 +18,9 @@
                 <li><a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a></li>
             </ul>
             {% endfor %}
-            <button onclick="downloadAllFiles()">Download All</button>
-            <button onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to Main</button>
+            <button class="button-green" onclick="downloadAllFiles()">Download All</button>
+            <button class="button-red" onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to
+                Main</button>
             <br>
             <div class="spinner" id="spinner"></div>
         </div>
