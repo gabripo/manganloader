@@ -5,18 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manga Download</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 
 <body>
     <h1>Available Files</h1>
     <ul>
         {% for file in files %}
-        <li><a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a></li>
+        <ul id="file-list">
+            <li><a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a></li>
+        </ul>
         {% endfor %}
-    </ul>
-    <button onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to Main</button>
-    <!-- TODO - button to download all the files -->
-    <!-- TODO - better naming of files-->
+        <button onclick="downloadAllFiles()">Download All</button>
+        <button onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to Main</button>
+
+        <script>
+            function downloadAllFiles() {
+                const files = Array.from(document.querySelectorAll('#file-list a')).map(anchor => anchor.getAttribute('href'));
+                const zip = new JSZip();
+
+                let promises = files.map((url, index) => {
+                    return fetch(url)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const filename = url.split('/').pop();
+                            zip.file(filename, blob);
+                        });
+                });
+
+                Promise.all(promises).then(() => {
+                    zip.generateAsync({ type: 'blob' }).then(content => {
+                        saveAs(content, 'all_files.zip');
+                    });
+                });
+            }
+        </script>
 </body>
 
 </html>
