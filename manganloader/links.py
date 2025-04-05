@@ -40,7 +40,7 @@ source_list = {
             'buttons': ['Show All Chapters'],
         },
         'javascript_args_chapter': {
-            'dummy': [],
+            'scrolls': 2,
         },
         },
     'mangatoto_dbs_col': {
@@ -70,7 +70,7 @@ source_list = {
                 "/html/body/div[1]/div[3]/div/div/div[1]/div[3]/button", # Quality
                 "/html/body/div[1]/div[3]/div/div/div[1]/div[3]/div/a[1]", # High
             ],
-            'scrolls': 3,
+            'scrolls': 2,
         },
         },
     'mangaberri_dbs_col': {
