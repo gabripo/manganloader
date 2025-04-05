@@ -35,6 +35,13 @@
                 <option value="raw">RAW (images)</option>
             </select>
 
+            <div id="device-dropdown-container" style="display: none;">
+                <label for="device-dropdown">Device:</label>
+                <select id="device-dropdown">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+
             <label for="number-input">Number of latest chapters to download:</label>
             <input type="number" id="number-input" name="number-input" value="1" min="1" required>
 
@@ -55,6 +62,9 @@
             dbs_bw: ['dbsmanga_bw'],
             dbs_col: ['mangaberri_dbs_col', 'mangareader_dbs_col', 'dbsmanga_col', 'weebcentral_dbs_col', 'mangatoto_dbs_col'],
         };
+        const deviceChoiceOptions = [
+            'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OBC', 'OTHER'
+        ]
         spinner.style.display = 'none';
 
         function populateSourceDropdown() {
@@ -92,6 +102,27 @@
             validateOptions();
         }
 
+        function populateDeviceDropdown() {
+            const format = document.getElementById('format-dropdown').value;
+            const deviceChoice = document.getElementById('device-dropdown');
+            const deviceChoiceContainer = document.getElementById('device-dropdown-container');
+
+            // clear previous options
+            deviceChoice.innerHTML = '<option value="">KCC</option>';
+
+            if (format == "epub") {
+                deviceChoiceContainer.style.display = 'block';
+                deviceChoiceOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    deviceChoice.appendChild(opt);
+                });
+            } else {
+                deviceChoiceContainer.style.display = 'none';
+            }
+        }
+
         function validateOptions() {
             const manga = document.getElementById('manga-dropdown').value;
             const source = document.getElementById('source-dropdown').value;
@@ -117,6 +148,7 @@
             const source = document.getElementById('source-dropdown').value;
             const numChaptersToDownload = document.getElementById('number-input').value;
             const format = document.getElementById('format-dropdown').value;
+            const device = document.getElementById('device-dropdown').value;
             const generateDoubleSpread = document.getElementById('double-spread-checkbox').checked;
 
             if (manga && source) {
@@ -125,7 +157,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ manga, source, numChaptersToDownload, format, generateDoubleSpread })
+                    body: JSON.stringify({ manga, source, numChaptersToDownload, format, device, generateDoubleSpread })
                 }).then(response => response.json())
                     .then(data => {
                         if (data.status === "success") {
@@ -166,6 +198,7 @@
         });
 
         document.getElementById('format-dropdown').addEventListener('change', function () {
+            populateDeviceDropdown();
             sendOptionsToBackend();
             validateOptions();
             toggleDoubleSpreadCheckbox();
@@ -196,6 +229,7 @@
         // Populate the second dropdown on page load
         window.addEventListener('load', function () {
             populateSourceDropdown();
+            populateDeviceDropdown();
         });
     </script>
 </body>

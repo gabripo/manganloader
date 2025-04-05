@@ -9,6 +9,7 @@ options = {
     'source': None,
     'num_chapters_to_download': 1,
     'format': 'PDF',
+    'device': 'KCC',
     'gen_double_spread': False,
 }
 OUTPUT_DIR = os.path.abspath(os.path.join(os.getcwd(), 'output'))
@@ -32,6 +33,9 @@ def update_options():
     options['format'] = data.get('format')
     options['gen_double_spread'] = data.get('generateDoubleSpread')
 
+    if options['format'] == 'epub':
+        options['device'] = data.get('device')
+
     return jsonify({"status": "success"})
 
 @app.route('/download', methods=['POST'])
@@ -44,6 +48,7 @@ def download():
         num_chapters=options['num_chapters_to_download'],
         format=options['format'],
         output_dir=OUTPUT_DIR,
+        device=options['device'],
         gen_double_spread=options['gen_double_spread'],
         )
 

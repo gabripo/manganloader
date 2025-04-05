@@ -481,6 +481,7 @@ def batch_download_chapters(
         output_format: str = "pdf",
         delete_temporary_files: bool = True,
         gen_double_spread: bool = False,
+        device: str = "KCC",
         javascript_args_chapter: dict = {},
         ):
     if type(chapters_links) == str:
@@ -500,6 +501,8 @@ def batch_download_chapters(
 
         if gen_double_spread:
             d.set_double_spread_version(gen_double_spread)
+
+        d.set_kcc_option('--profile', device)
 
         d.build_from_url(javascript_args_chapter=javascript_args_chapter)
 

@@ -10,6 +10,7 @@ def download_chapters(
         num_chapters: int,
         format: str,
         output_dir: str,
+        device: str,
         gen_double_spread: bool,
         ):
     print(f"Manga: {manga}, Source: {source}, Num chapters to download: {num_chapters}, Format: {format}, Output folder: {output_dir}")
@@ -36,6 +37,7 @@ def download_chapters(
         output_dir=output_dir,
         output_format=format,
         gen_double_spread=gen_double_spread,
+        device=device,
         javascript_args_chapter=javascript_args_chapter,
         )
     

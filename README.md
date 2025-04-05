@@ -63,7 +63,6 @@ If you are nerd, you can find examples of calls in the `test.py` and `download_c
 It can be useful for people writing Telegram bots - we both now to whom this message should be delivered, right @ShadowTemplate ?
 
 ## In the next episodes... (a.k.a. "ToDo List")
-- (front-end) Device selection if EPUB selected, we have KCC then we are powerful enough to generate device-specific files.
 - Extend to other mangas, beucase HxH is not to be neglected.
 - (back-end) Distinguish between SIMPLE (no Selenium) and NORMAL (with Selenium) version during deployment.
 - (back-end) Use either Gunicorn or Flask to serve the application, can be changed with an environment variable.
