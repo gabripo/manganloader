@@ -49,7 +49,7 @@
     </div>
 
     <script>
-        const secondDropdownOptions = {
+        const sourceChoiceOptions = {
             onepiece_bw: ['mangaplus'],
             onepiece_col: ['readonepiece'],
             dbs_bw: ['dbsmanga_bw'],
@@ -57,31 +57,31 @@
         };
         spinner.style.display = 'none';
 
-        function populateSecondDropdown() {
-            const firstDropdown = document.getElementById('manga-dropdown');
-            const secondDropdown = document.getElementById('source-dropdown');
-            const secondDropdownContainer = document.getElementById('source-dropdown-container');
-            const selectedOption = firstDropdown.value;
+        function populateSourceDropdown() {
+            const mangaChoice = document.getElementById('manga-dropdown');
+            const sourceChoice = document.getElementById('source-dropdown');
+            const sourceChoiceContainer = document.getElementById('source-dropdown-container');
+            const selectedOption = mangaChoice.value;
 
             // clear previous options
-            secondDropdown.innerHTML = '<option value="">-</option>';
+            sourceChoice.innerHTML = '<option value="">-</option>';
 
             if (selectedOption) {
-                secondDropdownContainer.style.display = 'block';
+                sourceChoiceContainer.style.display = 'block';
                 // Populate second dropdown based on the selected option
-                secondDropdownOptions[selectedOption].forEach(option => {
+                sourceChoiceOptions[selectedOption].forEach(option => {
                     const opt = document.createElement('option');
                     opt.value = option;
                     opt.textContent = option;
-                    secondDropdown.appendChild(opt);
+                    sourceChoice.appendChild(opt);
                 });
             } else {
-                secondDropdownContainer.style.display = 'none';
+                sourceChoiceContainer.style.display = 'none';
             }
 
             // select the first available option
-            if (secondDropdown.options.length > 1) {
-                secondDropdown.selectedIndex = 1;
+            if (sourceChoice.options.length > 1) {
+                sourceChoice.selectedIndex = 1;
             }
 
             // double-spread checkbox disabled by default
@@ -93,13 +93,13 @@
         }
 
         function validateOptions() {
-            const firstOption = document.getElementById('manga-dropdown').value;
-            const secondOption = document.getElementById('source-dropdown').value;
+            const manga = document.getElementById('manga-dropdown').value;
+            const source = document.getElementById('source-dropdown').value;
             const numberField = document.getElementById('number-input').value;
             const downloadButton = document.getElementById('download-button');
 
-            var mangaValid = firstOption && firstOption != "-"
-            var sourceValid = secondOption && secondOption != "-"
+            var mangaValid = manga && manga != "-"
+            var sourceValid = source && source != "-"
             var numberValid = !isNaN(numberField) && numberField >= 0
             if (mangaValid && sourceValid && numberValid) {
                 downloadButton.disabled = false;
@@ -138,12 +138,12 @@
         function toggleDoubleSpreadCheckbox() {
             const mangaDropdown = document.getElementById('manga-dropdown').value;
             const formatDropdown = document.getElementById('format-dropdown').value;
-            const checkboxContainer = document.getElementById('checkbox-container');
+            const doubleSpreadCheckbox = document.getElementById('checkbox-container');
 
             if (mangaDropdown === 'onepiece_bw' && formatDropdown === 'pdf') {
-                checkboxContainer.style.display = 'block';
+                doubleSpreadCheckbox.style.display = 'block';
             } else {
-                checkboxContainer.style.display = 'none';
+                doubleSpreadCheckbox.style.display = 'none';
             }
         }
 
@@ -156,7 +156,7 @@
         });
 
         document.getElementById('manga-dropdown').addEventListener('change', function () {
-            populateSecondDropdown();
+            populateSourceDropdown();
             sendOptionsToBackend();
         });
 
@@ -195,7 +195,7 @@
 
         // Populate the second dropdown on page load
         window.addEventListener('load', function () {
-            populateSecondDropdown();
+            populateSourceDropdown();
         });
     </script>
 </body>
