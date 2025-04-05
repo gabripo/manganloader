@@ -7,21 +7,29 @@
     <title>Manga Download</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
-    <h1>Available Files</h1>
     <ul>
-        {% for file in files %}
-        <ul id="file-list">
-            <li><a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a></li>
-        </ul>
-        {% endfor %}
-        <button onclick="downloadAllFiles()">Download All</button>
-        <button onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to Main</button>
+        <div class="container">
+            {% for file in files %}
+            <ul id="file-list">
+                <li><a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a></li>
+            </ul>
+            {% endfor %}
+            <button onclick="downloadAllFiles()">Download All</button>
+            <button onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to Main</button>
+            <br>
+            <div class="spinner" id="spinner"></div>
+        </div>
 
         <script>
+            spinner.style.display = 'none';
+
             function downloadAllFiles() {
+                spinner.style.display = 'inline-block';
+
                 const files = Array.from(document.querySelectorAll('#file-list a')).map(anchor => anchor.getAttribute('href'));
                 const zip = new JSZip();
 
@@ -37,6 +45,7 @@
                 Promise.all(promises).then(() => {
                     zip.generateAsync({ type: 'blob' }).then(content => {
                         saveAs(content, 'all_files.zip');
+                        spinner.style.display = 'none';
                     });
                 });
             }

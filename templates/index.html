@@ -45,6 +45,7 @@
 
             <button type="button" id="download-button" disabled>Download</button>
         </form>
+        <div class="spinner" id="spinner"></div>
     </div>
 
     <script>
@@ -54,6 +55,7 @@
             dbs_bw: ['dbsmanga_bw'],
             dbs_col: ['mangaberri_dbs_col', 'mangareader_dbs_col', 'dbsmanga_col', 'weebcentral_dbs_col', 'mangatoto_dbs_col'],
         };
+        spinner.style.display = 'none';
 
         function populateSecondDropdown() {
             const firstDropdown = document.getElementById('manga-dropdown');
@@ -174,16 +176,21 @@
         });
 
         document.getElementById('download-button').addEventListener('click', function () {
+            spinner.style.display = 'inline-block';
             sendOptionsToBackend();
             fetch('/download', {
                 method: 'POST'
             }).then(response => {
+                spinner.style.display = 'none';
                 if (response.ok) {
                     window.location.href = '/download_page';
                 } else {
                     console.error('Error downloading the file:', response.statusText);
                 }
-            }).catch(error => console.error('Error downloading the file:', error));
+            }).catch(error => {
+                spinner.style.display = 'none';
+                console.error('Error downloading the file:', error);
+            });
         });
 
         // Populate the second dropdown on page load

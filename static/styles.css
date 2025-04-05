@@ -55,3 +55,42 @@ button:hover {
 #second-dropdown-container {
     margin-top: 10px;
 }
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #007BFF;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px;
+    display: none;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#file-list {
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+    max-width: 600px;
+}
+#file-list li {
+    background-color: #fff;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+#file-list li a {
+    text-decoration: none;
+    color: #007BFF;
+    font-weight: bold;
+}
+#file-list li a:hover {
+    text-decoration: underline;
+}
