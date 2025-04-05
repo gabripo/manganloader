@@ -31,4 +31,5 @@ ENV PYTHONUNBUFFERED=TRUE
 # entrypoint with gunicorn
 ENV NumWorkers=1
 ENV NumThreads=1
-ENTRYPOINT gunicorn --bind 0.0.0.0:${TargetPort} flask_app:app -w ${NumWorkers} --threads ${NumThreads}
+ENV WorkerTimeoutSeconds=3600
+ENTRYPOINT gunicorn --bind 0.0.0.0:${TargetPort} flask_app:app -w ${NumWorkers} --threads ${NumThreads} --timeout ${WorkerTimeoutSeconds}
