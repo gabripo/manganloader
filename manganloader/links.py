@@ -83,4 +83,16 @@ source_list = {
         },
         'javascript_args_chapter': {},
         },
+    'zbato_hxh_col': {
+        'url': 'https://zbato.org/title/174873',
+        'base_url': 'https://zbato.org/title/174873-hunter-x-hunter-official-colored-pzg/',
+        'has_color': True,
+        'reverse_order': True,
+        'javascript_args_mainpage': {
+            'buttons_xpath': ['/html/body/div/main/div[3]/astro-island/div/div[1]/div[1]/span'],
+        },
+        'javascript_args_chapter': {
+            'buttons': ['load all pages'],
+        },
+    }
 }
