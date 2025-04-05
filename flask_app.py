@@ -57,7 +57,10 @@ def download():
     
 @app.route('/download_page', methods=['GET'])
 def download_page():
-    files = os.listdir(OUTPUT_DIR)
+    if os.path.exists(OUTPUT_DIR):
+        files = os.listdir(OUTPUT_DIR)
+    else:
+        files = []
     return render_template('download_page.html', files=files)
     
 @app.route('/download/<filename>')
