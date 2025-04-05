@@ -12,6 +12,12 @@ options = {
     'gen_double_spread': False,
 }
 OUTPUT_DIR = os.path.abspath(os.path.join(os.getcwd(), 'output'))
+manga_names_mapping = {
+    "onepiece_bw" : "One_Piece_",
+    "onepiece_col" : "One_Piece_colored_",
+    "dbs_bw" : "Dragon_Ball_Super_",
+    "dbs_col" : "Dragon_Ball_Super_colored_",
+}
 
 @app.route('/')
 def index():
@@ -33,7 +39,7 @@ def download():
     delete_folder(folder_path=OUTPUT_DIR)
 
     download_chapters(
-        manga=options['manga'],
+        manga=manga_names_mapping.get(options['manga'], 'Manga'),
         source=options['source'],
         num_chapters=options['num_chapters_to_download'],
         format=options['format'],
