@@ -18,6 +18,7 @@ manga_names_mapping = {
     "onepiece_col" : "One_Piece_colored_",
     "dbs_bw" : "Dragon_Ball_Super_",
     "dbs_col" : "Dragon_Ball_Super_colored_",
+    "hxh_col": "Hunter_x_Hunter_colored_",
 }
 
 @app.route('/')
