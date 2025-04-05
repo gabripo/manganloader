@@ -29,4 +29,6 @@ ENV PYTHONUNBUFFERED=TRUE
 # CMD ["flask_app.py"]
 
 # entrypoint with gunicorn
-ENTRYPOINT gunicorn --bind 0.0.0.0:${TargetPort} flask_app:app
+ENV NumWorkers=1
+ENV NumThreads=1
+ENTRYPOINT gunicorn --bind 0.0.0.0:${TargetPort} flask_app:app -w ${NumWorkers} --threads ${NumThreads}
