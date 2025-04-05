@@ -126,13 +126,15 @@
         function validateOptions() {
             const manga = document.getElementById('manga-dropdown').value;
             const source = document.getElementById('source-dropdown').value;
+            const format = document.getElementById('format-dropdown').value;
             const numberField = document.getElementById('number-input').value;
             const downloadButton = document.getElementById('download-button');
 
             var mangaValid = manga && manga != "-"
             var sourceValid = source && source != "-"
             var numberValid = !isNaN(numberField) && numberField >= 0
-            if (mangaValid && sourceValid && numberValid) {
+            var formatValid = format && format != "-"
+            if (mangaValid && sourceValid && numberValid && formatValid) {
                 downloadButton.disabled = false;
                 downloadButton.style.display = 'inline-block';
                 // alert("enabled");
