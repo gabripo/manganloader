@@ -12,7 +12,7 @@ def download_chapters(
         output_dir: str,
         gen_double_spread: bool,
         ):
-    print(f"Manga: {manga}, Source: {source}, Num chapters to download: {num_chapters}, Format: {format}, Output folder: ")
+    print(f"Manga: {manga}, Source: {source}, Num chapters to download: {num_chapters}, Format: {format}, Output folder: {output_dir}")
     source_dict = source_list.get(source, None)
     if source_dict is None:
         print("Invalid source specified! Nothing will be downloaded.")
