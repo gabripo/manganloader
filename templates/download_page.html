@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Download</title>
+</head>
+
+<body>
+    <h1>Available Files</h1>
+    <ul>
+        {% for file in files %}
+        <li><a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+    <button onclick="window.location.href='{{ url_for('back_to_main') }}'">Back to Main</button>
+    <!-- TODO - button to download all the files -->
+    <!-- TODO - better naming of files-->
+</body>
+
+</html>
