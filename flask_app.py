@@ -59,8 +59,12 @@ def download():
 def download_page():
     if os.path.exists(OUTPUT_DIR):
         files = os.listdir(OUTPUT_DIR)
+        if files:
+            for file in files:
+                print(f"File {file} found in folder {OUTPUT_DIR}")
     else:
         files = []
+        print(f"No files found in folder {OUTPUT_DIR} !")
     return render_template('download_page.html', files=files)
     
 @app.route('/download/<filename>')
