@@ -78,6 +78,8 @@
             if (mangaChoice.options.length > 1) {
                 mangaChoice.selectedIndex = 1;
             }
+
+            selectValueIfExists('manga-dropdown', 'onepiece_bw');
         }
 
         function populateSourceDropdown() {
@@ -134,6 +136,8 @@
             if (formatChoice.options.length > 1) {
                 formatChoice.selectedIndex = 1;
             }
+
+            selectValueIfExists('format-dropdown', 'pdf');
         }
 
         function populateDeviceDropdown() {
@@ -269,6 +273,21 @@
             populateFormatDropdown();
             populateDeviceDropdown();
         });
+
+        function selectValueIfExists(dropdownId, valueToSelect) {
+            const dropdown = document.getElementById(dropdownId);
+
+            if (dropdown) {
+                for (let option of dropdown.options) {
+                    if (option.value === valueToSelect) {
+                        dropdown.value = valueToSelect;
+                        console.log(`Value "${valueToSelect}" found and selected.`);
+                        return;
+                    }
+                }
+                console.log(`Value "${valueToSelect}" not found in the dropdown.`);
+            }
+        }
     </script>
 </body>
 
