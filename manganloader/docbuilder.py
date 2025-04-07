@@ -18,12 +18,7 @@ class Document:
         self.type = None
         self.double_spread_version = False
         self.double_spread_suffix = " double-spread.pdf"
-        self.supported_types = {
-            'pdf',
-            'epub',
-            'cbz',
-            'raw',
-        }
+        self.supported_types = Document.get_supported_types()
         Document.valid_kcc_options = {
             '--profile': {'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OTHER'},
             '--manga-style': None,
@@ -196,8 +191,14 @@ class Document:
             name = f"One Piece {num_latest_chapter} (ENG)"
         self.name = name
     
+    @classmethod
     def get_supported_types(self):
-        return self.supported_types
+        return {
+                'pdf',
+                'epub',
+                'cbz',
+                'raw',
+            }
 
     def build_from_url(self, javascript_args_chapter: dict = {}):
         if self._is_supported_type(self.type):

@@ -3,9 +3,8 @@ import os
 import secrets
 
 from manganloader.flask_helpers import download_chapters, delete_folder, determine_output_folder
+from manganloader.docbuilder import Document
 
-app = Flask(__name__)
-app.secret_key = secrets.token_hex(16) # needed for sessions management
 options = {
     'manga': None,
     'source': None,
@@ -15,6 +14,20 @@ options = {
     'gen_double_spread': False,
 }
 manga_names_mapping = {
+    "onepiece_bw" : "One Piece",
+    "onepiece_col" : "One Piece (colored)",
+    "dbs_bw" : "Dragon Ball Super",
+    "dbs_col" : "Dragon Ball Super (colored)",
+    "hxh_col": "Hunter x Hunter (colored)",
+}
+source_names_mapping = {
+    'onepiece_bw': ['mangaplus'],
+    'onepiece_col': ['readonepiece'],
+    'dbs_bw': ['dbsmanga_bw'],
+    'dbs_col': ['mangaberri_dbs_col', 'mangareader_dbs_col', 'dbsmanga_col', 'weebcentral_dbs_col', 'mangatoto_dbs_col'],
+    'hxh_col': ['zbato_hxh_col'],
+}
+manga_filenames_mapping = {
     "onepiece_bw" : "One_Piece_",
     "onepiece_col" : "One_Piece_colored_",
     "dbs_bw" : "Dragon_Ball_Super_",
@@ -22,9 +35,17 @@ manga_names_mapping = {
     "hxh_col": "Hunter_x_Hunter_colored_",
 }
 
+app = Flask(__name__)
+app.secret_key = secrets.token_hex(16) # needed for sessions management
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template(
+        'index.html',
+        manga_names_mapping=manga_names_mapping,
+        source_names_mapping=source_names_mapping,
+        supported_formats=sorted(list(Document.get_supported_types())), # sorting to preserve the same order, as being inherited from a set
+        )
 
 @app.route('/update_options', methods=['POST'])
 def update_options():
@@ -46,7 +67,7 @@ def download():
     delete_folder(folder_path=output_dir)
 
     download_chapters(
-        manga=manga_names_mapping.get(options['manga'], 'Manga'),
+        manga=manga_filenames_mapping.get(options['manga'], 'Manga'),
         source=options['source'],
         num_chapters=options['num_chapters_to_download'],
         format=options['format'],

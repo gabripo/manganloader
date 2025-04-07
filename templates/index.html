@@ -14,12 +14,7 @@
         <form id="options-form">
             <label for="manga-dropdown">Manga:</label>
             <select id="manga-dropdown">
-                <option value="">-</option>
-                <option value="onepiece_bw">One Piece</option>
-                <option value="onepiece_col">One Piece (colored)</option>
-                <option value="dbs_bw">Dragon Ball Super</option>
-                <option value="dbs_col">Dragon Ball Super (colored)</option>
-                <option value="hxh_col">Hunter x Hunter (colored)</option>
+                <!-- Options will be populated dynamically -->
             </select>
 
             <div id="source-dropdown-container" style="display: none;">
@@ -31,9 +26,7 @@
 
             <label for="format-dropdown">Target file format:</label>
             <select id="format-dropdown">
-                <option value="pdf">PDF</option>
-                <option value="epub">EPUB</option>
-                <option value="raw">RAW (images)</option>
+                <!-- Options will be populated dynamically -->
             </select>
 
             <div id="device-dropdown-container" style="display: none;">
@@ -57,17 +50,35 @@
     </div>
 
     <script>
-        const sourceChoiceOptions = {
-            onepiece_bw: ['mangaplus'],
-            onepiece_col: ['readonepiece'],
-            dbs_bw: ['dbsmanga_bw'],
-            dbs_col: ['mangaberri_dbs_col', 'mangareader_dbs_col', 'dbsmanga_col', 'weebcentral_dbs_col', 'mangatoto_dbs_col'],
-            hxh_col: ['zbato_hxh_col'],
-        };
+        const mangaChoiceOptions = JSON.parse('{{ manga_names_mapping|tojson|safe }}');
+        const sourceChoiceOptions = JSON.parse('{{ source_names_mapping|tojson|safe }}');
+        const formatChoiceOptions = JSON.parse('{{ supported_formats|tojson|safe }}');
         const deviceChoiceOptions = [
             'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OBC', 'OTHER'
         ]
         spinner.style.display = 'none';
+
+        function populateMangaDrowdown() {
+            const mangaChoice = document.getElementById('manga-dropdown');
+
+            // clear previous options
+            mangaChoice.innerHTML = '<option value="">-</option>';
+
+            if (mangaChoiceOptions) {
+                mangaListKeys = Object.keys(mangaChoiceOptions);
+                mangaListKeys.forEach(mangaKey => {
+                    const opt = document.createElement('option');
+                    opt.value = mangaKey;
+                    opt.textContent = mangaChoiceOptions[mangaKey];
+                    mangaChoice.appendChild(opt)
+                });
+            }
+
+            // select the first available option
+            if (mangaChoice.options.length > 1) {
+                mangaChoice.selectedIndex = 1;
+            }
+        }
 
         function populateSourceDropdown() {
             const mangaChoice = document.getElementById('manga-dropdown');
@@ -102,6 +113,27 @@
             toggleDoubleSpreadCheckbox();
             sendOptionsToBackend();
             validateOptions();
+        }
+
+        function populateFormatDropdown() {
+            const formatChoice = document.getElementById('format-dropdown');
+
+            // clear previous options
+            formatChoice.innerHTML = '<option value="">-</option>';
+
+            if (formatChoiceOptions) {
+                formatChoiceOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    formatChoice.appendChild(opt);
+                })
+            }
+
+            // select the first available option
+            if (formatChoice.options.length > 1) {
+                formatChoice.selectedIndex = 1;
+            }
         }
 
         function populateDeviceDropdown() {
@@ -232,7 +264,9 @@
 
         // Populate the second dropdown on page load
         window.addEventListener('load', function () {
+            populateMangaDrowdown();
             populateSourceDropdown();
+            populateFormatDropdown();
             populateDeviceDropdown();
         });
     </script>
