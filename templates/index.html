@@ -171,7 +171,7 @@
 
             var mangaValid = manga && manga != "-"
             var sourceValid = source && source != "-"
-            var numberValid = !isNaN(numberField) && numberField >= 0
+            var numberValid = !isNaN(numberField) && numberField >= 1
             var formatValid = format && format != "-"
             if (mangaValid && sourceValid && numberValid && formatValid) {
                 downloadButton.disabled = false;
