@@ -1,8 +1,32 @@
 import os
 import shutil
+import uuid
+import tempfile
+from flask import session
 from manganloader.pages_downloader import Mangapage
 from manganloader.docbuilder import batch_download_chapters
 from manganloader.links import source_list
+
+def determine_flask_session_id():
+    session_id = session.get('session_id')
+    if not session_id:
+        session_id = str(uuid.uuid4())
+        session['session_id'] = session_id
+    return session_id
+
+def determine_output_folder() -> str:
+    if os.getenv("APP_IN_DOCKER") == "Yes":
+        print("DOCKER EXECUTION DETECTED")
+        session_id = determine_flask_session_id()
+        output_dir = os.path.join(tempfile.gettempdir(), session_id)
+        print(f"Output directory for session id {session_id} set as: {output_dir}")
+    else:
+        output_dir = os.path.abspath(os.path.join(os.getcwd(), 'output'))
+        print(f"Output directory set as: {output_dir}")
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    return output_dir
 
 def download_chapters(
         manga: str,
