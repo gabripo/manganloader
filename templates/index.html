@@ -65,7 +65,7 @@
             mangaChoice.innerHTML = '<option value="">-</option>';
 
             if (mangaChoiceOptions) {
-                mangaListKeys = Object.keys(mangaChoiceOptions);
+                const mangaListKeys = Object.keys(mangaChoiceOptions);
                 mangaListKeys.forEach(mangaKey => {
                     const opt = document.createElement('option');
                     opt.value = mangaKey;
