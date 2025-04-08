@@ -5,11 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File",
+            "name": "Python Debugger: Current File - Include virtualenv debugging",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false,
         },
         {
             "name": "Python Debugger: Python File - Docker execution",
@@ -19,6 +20,7 @@
             "env": {
                 "APP_IN_DOCKER": "Yes",
             },
+            "justMyCode": false,
         }
     ]
 }
