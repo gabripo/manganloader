@@ -12,6 +12,7 @@ from manganloader.mloader_wrapper import MloaderWrapper
 VALID_RESPONSE_STATUS = 200
 MAX_RETRIES = 5
 MANGAPLUS_OP_URL = "https://jumpg-webapi.tokyo-cdn.com/api/title_detailV3?title_id=100020"
+MANGAPLUS_OP_BASEURL = "https://mangaplus.shueisha.co.jp/viewer/"
 class Mangapage:
     def __init__(self, manga_url: str = None):
         self.url = None
@@ -149,35 +150,34 @@ class Mangapage:
             return Mangapage.fetch_id_latest_chapter()
 
     @staticmethod
-    def fetch_num_latest_chapter():
-        latest_chapters = Mangapage.fetch_latest_chapters()
+    def fetch_num_latest_chapter(url = MANGAPLUS_OP_URL):
+        latest_chapters = Mangapage.fetch_latest_chapters(url=url)
         return max(latest_chapters.keys())
 
     @staticmethod
-    def fetch_id_latest_chapter():
-        latest_chapters = Mangapage.fetch_latest_chapters()
-        return latest_chapters[Mangapage.fetch_num_latest_chapter()]
+    def fetch_id_latest_chapter(url = MANGAPLUS_OP_URL):
+        latest_chapters = Mangapage.fetch_latest_chapters(url=url)
+        latest_chapter_num = max(latest_chapters.keys())
+        return latest_chapters[latest_chapter_num]
     
     @staticmethod
-    def build_url_from_id_chapter(id_chapter: str):
-        return f"https://mangaplus.shueisha.co.jp/viewer/{id_chapter}"
+    def fetch_url_latest_chapter(url = MANGAPLUS_OP_URL, base_url: str = MANGAPLUS_OP_BASEURL):
+        id_latest_chapter = Mangapage.fetch_id_latest_chapter(url=url)
+        return id_latest_chapter + base_url
     
     @staticmethod
-    def fetch_url_latest_chapter():
-        id_latest_chapter = Mangapage.fetch_id_latest_chapter()
-        return Mangapage.build_url_from_id_chapter(id_latest_chapter)
-    
-    @staticmethod
-    def fetch_latest_chapters():
-        url = MANGAPLUS_OP_URL
+    def fetch_latest_chapters(url = MANGAPLUS_OP_URL):
         response = Mangapage.fetch_webpage_response(url=url)
         if response.status_code != 200:
             print(f"Response of the url {url} is invalid! The latest chapters were not fetched!")
             return {}
-        chapter_nums = re.findall("#(\\d+)", response.text)
-        chapter_ids = re.findall("chapter/(\\d+)/chapter_thumbnail", response.text)
-        chapters = {ch_num: ch_id for ch_num, ch_id in zip(chapter_nums, chapter_ids)}
-        return chapters
+        if url == MANGAPLUS_OP_URL:
+            chapter_nums = re.findall("#(\\d+)", response.text)
+            chapter_ids = re.findall("chapter/(\\d+)/chapter_thumbnail", response.text)
+            chapters = {ch_num: ch_id for ch_num, ch_id in zip(chapter_nums, chapter_ids)}
+            return chapters
+        else:
+            return {}
     
     @staticmethod
     def fetch_latest_chapters_generic(
@@ -187,8 +187,8 @@ class Mangapage:
         ):
         if base_url is None and url == MANGAPLUS_OP_URL:
             print("Fetching the latest One Piece chapters from Mangaplus...")
-            chapters_num_id = Mangapage.fetch_latest_chapters()
-            chapters_links = [Mangapage.build_url_from_id_chapter(ch_id) for ch_id in chapters_num_id.values()]
+            chapters_num_id = Mangapage.fetch_latest_chapters(url=MANGAPLUS_OP_URL)
+            chapters_links = [MANGAPLUS_OP_BASEURL + ch_id for ch_id in chapters_num_id.values()]
             return chapters_links
         if url is None or base_url is None:
             print(f"Invalid combination of url and base url specified: impossible to fetch the latest chapters. Fallback to One Piece colored.")
