@@ -486,9 +486,27 @@ def batch_download_chapters(
         javascript_args_chapter: dict = {},
         ):
     if type(chapters_links) == str:
-        chapters_links = [chapters_links]
-    for id, link in enumerate(chapters_links):
-        chapter_name = prefix + "{:05}".format(len(chapters_links)-id)
+        chapters_links = [chapters_links] # [{'link': chapters_links, 'num': 0}]
+    num_chapters = len(chapters_links)
+    for id, link_num in enumerate(chapters_links):
+        if type(link_num) == str:
+            link = link_num
+            num = num_chapters - id
+        elif type(link_num) == dict:
+            link = link_num.get('link', '')
+            num = link_num.get('num', num_chapters - id)
+        else:
+            print(f"Invalid format of chapter link and number for entry {id} , skipping the chapter...")
+            continue
+
+        if link is None:
+            print(f"Invalid link for chapter with number {num} . The chapter will be skipped")
+            continue
+        if type(num) == str:
+            chapter_name = prefix + num
+        else:
+            chapter_name = prefix + f"{num:06}"
+        
         d = Document(
             name=chapter_name,
             source_url=link,

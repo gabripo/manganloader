@@ -14,6 +14,10 @@ source_list = {
         'reverse_order': False,
         'javascript_args_mainpage': {},
         'javascript_args_chapter': {},
+        'naming_strategy': {
+            'strategy': 'url_removal',
+            'url_to_remove': 'https://ww11.readonepiece.com/index.php/chapter/one-piece-digital-colored-comics-chapter-',
+            },
         },
     'dbsmanga_bw': {
         'url': 'https://ww9.dbsmanga.com/manga/dragon-ball-super/',
@@ -22,6 +26,10 @@ source_list = {
         'reverse_order': False,
         'javascript_args_mainpage': {},
         'javascript_args_chapter': {},
+        'naming_strategy': {
+            'strategy': 'url_removal',
+            'url_to_remove': 'https://ww9.dbsmanga.com/chapter/dragon-ball-super-chapter-',
+            },
         },
     'dbsmanga_col': {
         'url': 'https://ww9.dbsmanga.com/manga/dragon-ball-super-colored/',
@@ -30,6 +38,10 @@ source_list = {
         'reverse_order': False,
         'javascript_args_mainpage': {},
         'javascript_args_chapter': {},
+        'naming_strategy': {
+            'strategy': 'url_removal',
+            'url_to_remove': 'https://ww9.dbsmanga.com/chapter/dragon-ball-super-colored-chapter-',
+            },
         },
     'weebcentral_dbs_col': {
         'url': 'https://weebcentral.com/series/01J76XYEWEQKT8DFAMV2S1Z883/Dragon-Ball-Super-Color',
@@ -54,6 +66,10 @@ source_list = {
         'javascript_args_chapter': {
             'buttons': ['load all pages'],
         },
+        'naming_strategy': {
+            'strategy': 'from_substring',
+            'start_substring': 'vol',
+            },
         },
     'mangareader_dbs_col': {
         'url': 'https://mangareader.to/dragon-ball-super-color-edition-55928',
@@ -72,6 +88,10 @@ source_list = {
             ],
             'scrolls': 2,
         },
+        'naming_strategy': {
+            'strategy': 'url_removal',
+            'url_to_remove': 'https://mangareader.to/read/dragon-ball-super-color-edition-55928/en/chapter-',
+            },
         },
     'mangaberri_dbs_col': {
         'url': 'https://mangaberri.com/dbs-colored-manga',
@@ -94,5 +114,9 @@ source_list = {
         'javascript_args_chapter': {
             'buttons': ['load all pages'],
         },
+        'naming_strategy': {
+            'strategy': 'from_substring',
+            'start_substring': 'vol',
+            },
     }
 }

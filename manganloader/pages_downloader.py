@@ -184,6 +184,7 @@ class Mangapage:
         url: str = None,
         base_url: str = None,
         javascript_args_mainpage: dict = {},
+        naming_strategy: dict = None,
         ):
         if base_url is None and url == MANGAPLUS_OP_URL:
             print("Fetching the latest One Piece chapters from Mangaplus...")
@@ -239,6 +240,20 @@ class Mangapage:
             if link not in seen:
                 seen.add(link)
                 chapters_links.append(link)
+
+        if naming_strategy is not None:
+            strategy = naming_strategy.get('strategy', None)
+            if strategy == 'url_removal':
+                url_to_remove = naming_strategy.get('url_to_remove', '')
+                for id, link in enumerate(chapters_links):
+                    chapter_num = Mangapage._naming_strategy_url_removal(link, url_to_remove)
+                    chapters_links[id] = {'link': link, 'num': chapter_num}
+            elif strategy == 'from_substring':
+                start_substring = naming_strategy.get('start_substring', '')
+                for id, link in enumerate(chapters_links):
+                    start_index = link.find(start_substring)
+                    chapter_num = link[start_index:]
+                    chapters_links[id] = {'link': link, 'num': chapter_num}
         return chapters_links
     
     def _extract_images_urls(self, response):
@@ -253,6 +268,23 @@ class Mangapage:
             ]
         images_urls = self._exclude_outlier_urls(images_urls)
         return images_urls
+    
+    @staticmethod
+    def _naming_strategy_url_removal(link: str, url_to_remove: str) -> int | float | str:
+        chapter_num_str = link.replace(url_to_remove, '').strip('/')
+        if Mangapage._string_is_number(chapter_num_str):
+            try:
+                chapter_num = int(chapter_num_str)
+            except:
+                chapter_num = float(chapter_num_str)
+        else:
+            chapter_num = chapter_num_str
+        return chapter_num
+    
+    @staticmethod
+    def _string_is_number(num_str: str) -> bool:
+        pattern = r'^-?\d+(\.\d+)?$'
+        return re.match(pattern, num_str)
     
     @staticmethod
     def _clean_image_url(img_url: str) -> str:
