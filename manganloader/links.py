@@ -102,6 +102,10 @@ source_list = {
             "dummy": [],
         },
         'javascript_args_chapter': {},
+        'naming_strategy': {
+            'strategy': 'from_webpage',
+            'css_selector': 'span.text.default.normal'
+        }
         },
     'zbato_hxh_col': {
         'url': 'https://zbato.org/title/174873',

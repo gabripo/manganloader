@@ -94,6 +94,11 @@ class SeleniumManager():
             return
         return self.driver
     
+    def is_driver_running(self):
+        if not self.is_driver_available():
+            return False
+        return self.driver.service.is_connectable()
+    
     def find_images(self):
         if not self.is_driver_available():
             return

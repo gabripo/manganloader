@@ -6,6 +6,7 @@ import time
 import re
 import base64
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
 from manganloader.selenium_manager import SeleniumManager, SELENIUM_LOAD_TIME_SHORT_S, SELENIUM_LOAD_TIME_LONG_S
 from manganloader.mloader_wrapper import MloaderWrapper
 
@@ -223,7 +224,11 @@ class Mangapage:
                 print(f"Impossible to fetch links from the url {url} : {exc}")
                 links = []
             finally:
-                driver.quit()
+                if naming_strategy is not None and naming_strategy.get('strategy', None) == 'from_webpage':
+                    # if we want to use the webpage to extract the chapter number we need to keep the driver open
+                    pass
+                else:
+                    driver.quit()
         else:
             # static rendering without Javascript
             response = Mangapage.fetch_webpage_response(url)
@@ -240,6 +245,18 @@ class Mangapage:
             if link not in seen:
                 seen.add(link)
                 chapters_links.append(link)
+        
+        if links_selenium:
+            seen = set()
+            links_selenium_cleaned = []
+            for link_selenium in links_selenium:
+                link = link_selenium.get_attribute('href')
+                if base_url not in link:
+                    continue
+                if link not in seen:
+                    seen.add(link)
+                    links_selenium_cleaned.append(link_selenium)
+            links_selenium = links_selenium_cleaned
 
         if naming_strategy is not None:
             strategy = naming_strategy.get('strategy', None)
@@ -254,6 +271,19 @@ class Mangapage:
                     start_index = link.find(start_substring)
                     chapter_num = link[start_index:]
                     chapters_links[id] = {'link': link, 'num': chapter_num}
+            elif strategy == 'from_webpage':
+                if 'selenium_manager' not in locals() or not selenium_manager.is_driver_running():
+                    print(f"Invalid driver! Impossible to extract chapter numbers from the webpage {url}!")
+                else:
+                    css_to_find = naming_strategy.get('css_selector', None)
+                    if css_to_find is None:
+                        print(f"Invalid css selector specified for webpage {url}: no chapter numbers will be extracted!")
+                    else:
+                        for id, link_selenium in enumerate(links_selenium):
+                            # assuming the same order of links and links_selenium
+                            chapter_num = Mangapage._naming_strategy_from_webpage(link_selenium, css_to_find)
+                            chapters_links[id] = {'link': link_selenium.get_attribute('href'), 'num': chapter_num}
+                    driver.quit()
         return chapters_links
     
     def _extract_images_urls(self, response):
@@ -279,6 +309,12 @@ class Mangapage:
                 chapter_num = float(chapter_num_str)
         else:
             chapter_num = chapter_num_str
+        return chapter_num
+    
+    @staticmethod
+    def _naming_strategy_from_webpage(link_selenium, css_selector: str) -> str:
+        span_element = link_selenium.find_element(By.CSS_SELECTOR, css_selector)
+        chapter_num = span_element.text.strip()
         return chapter_num
     
     @staticmethod
