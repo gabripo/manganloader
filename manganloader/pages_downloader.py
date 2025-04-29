@@ -268,8 +268,7 @@ class Mangapage:
             elif strategy == 'from_substring':
                 start_substring = naming_strategy.get('start_substring', '')
                 for id, link in enumerate(chapters_links):
-                    start_index = link.find(start_substring)
-                    chapter_num = link[start_index:]
+                    chapter_num = Mangapage._naming_strategy_from_substring(link, start_substring)
                     chapters_links[id] = {'link': link, 'num': chapter_num}
             elif strategy == 'from_webpage':
                 if 'selenium_manager' not in locals() or not selenium_manager.is_driver_running():
@@ -302,25 +301,36 @@ class Mangapage:
     @staticmethod
     def _naming_strategy_url_removal(link: str, url_to_remove: str) -> int | float | str:
         chapter_num_str = link.replace(url_to_remove, '').strip('/')
+        return Mangapage._chapter_num_str_to_num(chapter_num_str)
+    
+    @staticmethod
+    def _naming_strategy_from_substring(link: str, start_substring: str):
+        start_index = link.find(start_substring)
+        chapter_num_str = link[start_index:]
+        return Mangapage._chapter_num_str_to_num(chapter_num_str)
+    
+    @staticmethod
+    def _naming_strategy_from_webpage(link_selenium, css_selector: str) -> str:
+        span_element = link_selenium.find_element(By.CSS_SELECTOR, css_selector)
+        chapter_num_str = span_element.text.strip()
+        return Mangapage._chapter_num_str_to_num(chapter_num_str)
+    
+    @staticmethod
+    def _string_is_number(num_str: str) -> bool:
+        pattern = r'^-?\d+(\.\d+)?$'
+        return re.match(pattern, num_str)
+    
+    @staticmethod
+    def _chapter_num_str_to_num(chapter_num_str: str) -> int | float | str:
         if Mangapage._string_is_number(chapter_num_str):
             try:
                 chapter_num = int(chapter_num_str)
             except:
                 chapter_num = float(chapter_num_str)
         else:
+            # fallback to string, if too difficult to convert
             chapter_num = chapter_num_str
         return chapter_num
-    
-    @staticmethod
-    def _naming_strategy_from_webpage(link_selenium, css_selector: str) -> str:
-        span_element = link_selenium.find_element(By.CSS_SELECTOR, css_selector)
-        chapter_num = span_element.text.strip()
-        return chapter_num
-    
-    @staticmethod
-    def _string_is_number(num_str: str) -> bool:
-        pattern = r'^-?\d+(\.\d+)?$'
-        return re.match(pattern, num_str)
     
     @staticmethod
     def _clean_image_url(img_url: str) -> str:
