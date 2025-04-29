@@ -246,7 +246,7 @@ class Mangapage:
                 seen.add(link)
                 chapters_links.append(link)
         
-        if links_selenium:
+        if 'links_selenium' in locals():
             seen = set()
             links_selenium_cleaned = []
             for link_selenium in links_selenium:
