@@ -36,6 +36,13 @@
                 </select>
             </div>
 
+            <div id="chapter-num-info-container" style="display: none;">
+                <label for="last-chapter-num-text">Last chapter number available:</label>
+                <div id="last-chapter-num-value">
+                    <!-- Text will be populated after the value determination in the Javascript part-->
+                </div>
+            </div>
+
             <label for="number-input">Number of latest chapters to download:</label>
             <input type="number" id="number-input" name="number-input" value="1" min="1" required>
 
@@ -224,7 +231,10 @@
         function determineLastChapterNum() {
             const manga = document.getElementById('manga-dropdown').value;
             const source = document.getElementById('source-dropdown').value;
+            const lastChapterNumTextContainer = document.getElementById('chapter-num-info-container');
+            const lastChapterNumTextValue = document.getElementById('last-chapter-num-value');
 
+            lastChapterNumTextContainer.style.display = 'none';
             if (manga && source) {
                 fetch('/determine_last_chapter', {
                     method: 'GET',
@@ -242,7 +252,8 @@
                         else if (data.status === "success") {
                             manga_extended_name = mangaChoiceOptions[manga];
                             console.log(`Number of last chapter for manga ${manga_extended_name} : ${data.last_chapter_num}`)
-                            // TODO - print in the webpage, as well
+                            lastChapterNumTextContainer.style.display = 'block';
+                            lastChapterNumTextValue.innerHTML = `<strong>${data.last_chapter_num}</strong>`
                         }
                     })
             }
