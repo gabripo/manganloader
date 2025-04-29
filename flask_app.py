@@ -3,7 +3,7 @@ import os
 import secrets
 
 from manganloader.flask_options import options, manga_names_mapping, source_names_mapping, manga_filenames_mapping
-from manganloader.flask_helpers import download_chapters, delete_folder, determine_output_folder
+from manganloader.flask_helpers import download_chapters, delete_folder, determine_output_folder, get_chapter_links
 from manganloader.docbuilder import Document
 
 app = Flask(__name__)
@@ -32,6 +32,30 @@ def update_options():
 
     return jsonify({"status": "success"})
 
+@app.route('/determine_last_chapter', methods=['GET'])
+def determine_last_chapter():
+    source = options.get('source', None)
+    if source is None:
+        print("Invalid source selected, impossible to determine the last available chapter.")
+        return jsonify({"status": "empty_source"})
+    
+    chapters_links = get_chapter_links(source=source)
+    if chapters_links is None:
+        print(f"Selected source {source} is not supported, impossible to determine the last available chapter.")
+        return jsonify({"status": "invalid_source"})
+
+    last_chapter_num = 0
+    for link in chapters_links:
+        if type(link) == dict:
+            chapter_num = link.get('num', "")
+            if type(chapter_num) != str:
+                last_chapter_num = max(last_chapter_num, chapter_num)
+    
+    if last_chapter_num == 0:
+        return jsonify({"status": "chapter_nums_not_available"})
+    else:
+        return jsonify({"status": "success", "last_chapter_num": last_chapter_num})
+    
 @app.route('/download', methods=['POST'])
 def download():
     output_dir = determine_output_folder()

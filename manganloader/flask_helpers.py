@@ -28,6 +28,26 @@ def determine_output_folder() -> str:
         os.makedirs(output_dir)
     return output_dir
 
+def get_chapter_links(
+        source: str,
+        ) -> list:
+    fetch_chapters_arg_names = (
+        'url',
+        'base_url',
+        'javascript_args_mainpage',
+        'naming_strategy',
+    )
+    source_dict = source_list.get(source, None)
+    if source_dict is None:
+        return None
+
+    fetch_chapters_args = {
+        arg_name: source_dict.get(arg_name, None)
+        for arg_name in fetch_chapters_arg_names
+    }
+    chapters_links = Mangapage.fetch_latest_chapters_generic(**fetch_chapters_args)
+    return chapters_links
+
 def download_chapters(
         manga: str,
         source: str,

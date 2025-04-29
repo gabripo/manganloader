@@ -58,6 +58,7 @@
         ]
         const spinner = document.getElementById('spinner');
         spinner.style.display = 'none';
+        let isFirstLoad = true;
 
         function populateMangaDrowdown() {
             const mangaChoice = document.getElementById('manga-dropdown');
@@ -220,6 +221,33 @@
             }
         }
 
+        function determineLastChapterNum() {
+            const manga = document.getElementById('manga-dropdown').value;
+            const source = document.getElementById('source-dropdown').value;
+
+            if (manga && source) {
+                fetch('/determine_last_chapter', {
+                    method: 'GET',
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status === "empty_source") {
+                            console.log("Empty source, impossible to determine the last chapter in the backend.")
+                        }
+                        else if (data.status == "invalid_source") {
+                            console.log("Invalid source, impossible to determine the last chapter in the backend.")
+                        }
+                        else if (data.status === "chapter_nums_not_available") {
+                            console.log("Numbers of chapter not available given the provided information.")
+                        }
+                        else if (data.status === "success") {
+                            manga_extended_name = mangaChoiceOptions[manga];
+                            console.log(`Number of last chapter for manga ${manga_extended_name} : ${data.last_chapter_num}`)
+                            // TODO - print in the webpage, as well
+                        }
+                    })
+            }
+        }
+
         document.getElementById('number-input').addEventListener('change', function () {
             const numberField = document.getElementById('number-input');
             if (numberField.value < 1) {
@@ -231,11 +259,17 @@
         document.getElementById('manga-dropdown').addEventListener('change', function () {
             populateSourceDropdown();
             sendOptionsToBackend();
+            if (!isFirstLoad) {
+                determineLastChapterNum();
+            }
         });
 
         document.getElementById('source-dropdown').addEventListener('change', function () {
             sendOptionsToBackend();
             validateOptions();
+            if (!isFirstLoad) {
+                determineLastChapterNum();
+            }
         });
 
         document.getElementById('format-dropdown').addEventListener('change', function () {
@@ -275,6 +309,9 @@
             populateDeviceDropdown();
             toggleDoubleSpreadCheckbox();
             validateOptions();
+            sendOptionsToBackend();
+            determineLastChapterNum();
+            isFirstLoad = false;
         });
 
         function selectValueIfExists(dropdownId, valueToSelect) {
