@@ -371,6 +371,7 @@ class Mangapage:
                 for id, url in enumerate(images_urls)
                 ]
             img_paths = await asyncio.gather(*tasks)
+            img_paths = [img for img in img_paths if img is not None]
             return img_paths
 
     async def _download_image(
@@ -387,23 +388,31 @@ class Mangapage:
         session.headers.update(self._build_session_headers(img_url))
         attempts = 0
         while attempts < max_retries:
-            async with session.get(img_url) as response:
-                content = await response.read()
+            try:
+                async with session.get(img_url) as response:
+                    content = await response.read()
+            except Exception as exc:
+                print(f"Error while creating the response for URL {img_url} : {exc}")
+                content = None
 
             if not content or response.status != VALID_RESPONSE_STATUS:
                 attempts += 1
                 if attempts == max_retries:
                     print(f"Impossible to download image from url {img_url} !")
-                    return ''   
+                    return None
                 print(f"Impossible to download image from url {img_url} ! Retry for the {attempts}-th time after {wait_time_s} seconds...")
                 time.sleep(wait_time_s)
             else:
                 break
 
-        async with aiofiles.open(img_path, "wb") as f:
-            await f.write(content)
-        print(f"Image stored from url {img_url} into {img_path} !")
-        return img_path
+        if content:
+            async with aiofiles.open(img_path, "wb") as f:
+                await f.write(content)
+            print(f"Image stored from url {img_url} into {img_path} !")
+            return img_path
+        else:
+            print(f"Empty content for URL {img_url}")
+            return None
     
     @staticmethod
     def _build_session_headers(url: str) -> dict:
