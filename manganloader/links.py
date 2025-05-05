@@ -107,6 +107,20 @@ source_list = {
             'css_selector': 'span.text.default.normal'
         }
         },
+    'mangaberri_chainsaw_bw': {
+        'url': 'https://mangaberri.com/chainsaw-man-manga',
+        'base_url': 'https://mangaberri.com/chainsaw-man-manga/',
+        'has_color': True,
+        'reverse_order': False,
+        'javascript_args_mainpage': {
+            "dummy": [],
+        },
+        'javascript_args_chapter': {},
+        'naming_strategy': {
+            'strategy': 'from_webpage',
+            'css_selector': 'span.text.default.normal'
+        }
+        },
     'zbato_hxh_col': {
         'url': 'https://zbato.org/title/174873',
         'base_url': 'https://zbato.org/title/174873-hunter-x-hunter-official-colored-pzg/',

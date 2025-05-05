@@ -12,6 +12,7 @@ manga_names_mapping = {
     "dbs_bw" : "Dragon Ball Super",
     "dbs_col" : "Dragon Ball Super (colored)",
     "hxh_col": "Hunter x Hunter (colored)",
+    "chainsaw_bw": "Chainsaw Man",
 }
 source_names_mapping = {
     'onepiece_bw': ['mangaplus'],
@@ -19,6 +20,7 @@ source_names_mapping = {
     'dbs_bw': ['dbsmanga_bw'],
     'dbs_col': ['mangaberri_dbs_col', 'mangareader_dbs_col', 'dbsmanga_col', 'weebcentral_dbs_col', 'mangatoto_dbs_col'],
     'hxh_col': ['zbato_hxh_col'],
+    "chainsaw_bw": ['mangaberri_chainsaw_bw'],
 }
 manga_filenames_mapping = {
     "onepiece_bw" : "One_Piece_",
@@ -26,4 +28,5 @@ manga_filenames_mapping = {
     "dbs_bw" : "Dragon_Ball_Super_",
     "dbs_col" : "Dragon_Ball_Super_colored_",
     "hxh_col": "Hunter_x_Hunter_colored_",
+    "chainsaw_bw": "Chainsaw_Man_",
 }
