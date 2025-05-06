@@ -18,6 +18,7 @@ class Document:
         self.type = None
         self.double_spread_version = False
         self.double_spread_suffix = " double-spread.pdf"
+        self.supported_image_types = ('.jpg', '.jpeg', '.png')
         self.supported_types = Document.get_supported_types()
         Document.valid_kcc_options = {
             '--profile': {'K1', 'K11', 'K2', 'K34', 'K578', 'KDX', 'KPW', 'KV', 'KPW5', 'KO', 'KS', 'KoMT', 'KoG', 'KoGHD', 'KoA', 'KoAHD', 'KoAH2O', 'KoAO', 'KoN', 'KoC', 'KoCC', 'KoL', 'KoLC', 'KoF', 'KoS', 'KoE', 'Rmk1', 'Rmk2', 'RmkPP', 'OTHER'},
@@ -92,6 +93,7 @@ class Document:
             '--format', 'EPUB',
             '--splitter', '2', # rotate
         ]
+        self.local_execution = False
         self.output_dir = None
         self.working_dir = None
         self.images = None
@@ -102,7 +104,10 @@ class Document:
         self.set_working_dir(working_dir)
     
     def set_url(self, url: str) -> None:
-        if url is None or not Mangapage.is_valid_url(url):
+        if not Mangapage.is_valid_url(url) and os.path.exists(url) and os.path.isdir(url):
+            print(f"Local execution detected: ensure the images to convert are available at path {url} !")
+            self.local_execution = True
+        elif url is None or not Mangapage.is_valid_url(url):
             print("Url not specified! The latest chapter will be used.")
             url = Mangapage.fetch_url_latest_chapter()
         self.source_url = url
@@ -174,7 +179,7 @@ class Document:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-    def set_working_dir(self, working_dir: str):
+    def set_working_dir(self, working_dir: str = None):
         if working_dir is None:
             self.working_dir = os.path.abspath(os.path.join(os.getcwd(), "temp"))
             print(f"Working directory not specified, using {self.working_dir} ...")
@@ -202,11 +207,35 @@ class Document:
 
     def build_from_url(self, javascript_args_chapter: dict = {}):
         if self._is_supported_type(self.type):
-            page = Mangapage(self.source_url)
-            self.images = page.fetch_images(
-                output_folder=self.working_dir,
-                javascript_args_chapter=javascript_args_chapter,
-                )
+            if self.local_execution:
+                print("Local execution detected, ensure you provided a valid image folder!")
+                self.set_working_dir() # first create the working dir, needed for non-PDF files generation
+
+                source_images = sorted([
+                    os.path.join(os.path.abspath(self.source_url), img)
+                    for img in os.listdir(self.source_url)
+                    if img.endswith(self.supported_image_types)
+                    ])  # sorting to ensure order of pages
+                # images have to be copied into working folder, as kcc could have permission issues
+
+                self.images = []
+                self.set_working_dir(os.path.join(self.working_dir, self.name)) # specific temporary folder
+                for source_image in source_images:
+                    target_image = os.path.join(
+                        os.path.abspath(self.working_dir),
+                        os.path.basename(source_image)
+                        )
+                    try:
+                        shutil.copy(source_image, target_image)
+                        self.images.append(target_image)
+                    except Exception as exc:
+                        print(f"Impossible to copy file {source_image} into desired path {target_image} : {exc}")
+            else:
+                page = Mangapage(self.source_url)
+                self.images = page.fetch_images(
+                    output_folder=self.working_dir,
+                    javascript_args_chapter=javascript_args_chapter,
+                    )
 
             print(f"Generating {self.type} document from {self.source_url}...")
             if self.type == 'pdf':
