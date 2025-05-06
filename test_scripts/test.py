@@ -1,5 +1,5 @@
-import re
 import os
+import import_root_path
 from manganloader.docbuilder import Document
 
 OP_TEST = True

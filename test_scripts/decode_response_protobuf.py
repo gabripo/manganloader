@@ -2,6 +2,7 @@ from requests import Session
 # from mloader.response_pb2 import (
 #     Response,
 # )
+import import_root_path
 from manganloader.protobuf_lib.mangaplus_pb2 import (
     Response,
 )

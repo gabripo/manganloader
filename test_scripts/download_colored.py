@@ -2,6 +2,7 @@ import requests
 import asyncio
 import os
 from bs4 import BeautifulSoup
+import import_root_path
 from manganloader.docbuilder import Document, batch_download_chapters
 from manganloader.pages_downloader import Mangapage
 
