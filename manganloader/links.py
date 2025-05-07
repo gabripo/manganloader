@@ -136,5 +136,17 @@ source_list = {
             'strategy': 'from_substring',
             'start_substring': 'vol',
             },
-    }
+    },
+    'kaiju_no_8_bw': {
+        'url': 'https://kaiju-no-8manga.com/',
+        'base_url': 'https://kaiju-no-8manga.com/manga/',
+        'has_color': False,
+        'reverse_order': False,
+        'javascript_args_mainpage': {},
+        'javascript_args_chapter': {},
+        'naming_strategy': {
+            'strategy': 'url_removal',
+            'url_to_remove': 'https://kaiju-no-8manga.com/manga/kaiju-no-8-chapter-',
+            },
+        },
 }
