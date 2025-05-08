@@ -110,7 +110,7 @@ source_list = {
     'mangaberri_chainsaw_bw': {
         'url': 'https://mangaberri.com/chainsaw-man-manga',
         'base_url': 'https://mangaberri.com/chainsaw-man-manga/',
-        'has_color': True,
+        'has_color': False,
         'reverse_order': False,
         'javascript_args_mainpage': {
             "dummy": [],
