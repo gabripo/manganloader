@@ -22,7 +22,7 @@ source_names_mapping = {
     'dbs_col': ['mangaberri_dbs_col', 'mangareader_dbs_col', 'dbsmanga_col', 'weebcentral_dbs_col', 'mangatoto_dbs_col'],
     'hxh_col': ['zbato_hxh_col'],
     "chainsaw_bw": ['mangaberri_chainsaw_bw'],
-    "kaiju_no_8_bw": ["kaiju_no_8_bw"],
+    "kaiju_no_8_bw": ["kaiju_no_8_manga_bw", "mangaberri_kaiju_no_8_bw"],
 }
 manga_filenames_mapping = {
     "onepiece_bw" : "One_Piece_",
